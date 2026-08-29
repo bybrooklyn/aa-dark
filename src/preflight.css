@@ -1,0 +1,7 @@
+/* Injected before page construction to avoid a white startup flash. */
+@media screen {
+  :root {
+    background-color: #100d12 !important;
+    color-scheme: dark !important;
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "artificial-analysis-dark",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A carefully designed dark theme for Artificial Analysis.",
+  "license": "CC0-1.0",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/generate-assets.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:e2e": "npm run build && playwright test",
+    "audit:live": "node scripts/audit-sitemaps.mjs",
+    "package": "npm run build && node scripts/package.mjs",
+    "validate": "npm run test && npm run audit:live && npm run test:e2e && npm run package"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.55.0",
+    "esbuild": "^0.25.9",
+    "fflate": "^0.8.2",
+    "sharp": "^0.35.4"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "fsevents": false
+  }
+}

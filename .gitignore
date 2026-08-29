@@ -1,0 +1,8 @@
+node_modules/
+dist/
+generated-assets/
+test-results/
+playwright-report/
+releases/*.zip
+releases/*.crx
+.DS_Store
