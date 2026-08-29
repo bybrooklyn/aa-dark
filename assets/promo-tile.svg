@@ -13,10 +13,8 @@
   <rect width="440" height="280" rx="24" fill="url(#bg)"/>
   <rect width="440" height="280" rx="24" fill="url(#glow)"/>
   <rect x="1" y="1" width="438" height="278" rx="23" fill="none" stroke="#59475F" stroke-width="2"/>
-  <path d="M111 139c-28 3.5-48.2-23.6-35-47a42.3 42.3 0 1 0 48 64.1 42 42 0 0 0 10.3-27.1 32.3 32.3 0 0 1-23.3 10Z" fill="#AE82FF"/>
-  <rect x="100" y="136" width="10" height="33" rx="5" fill="#C7FF73"/>
-  <rect x="117" y="123" width="10" height="46" rx="5" fill="#A8F7DF"/>
-  <rect x="134" y="106" width="10" height="63" rx="5" fill="#FF8254"/>
+  <rect x="54" y="82" width="104" height="104" rx="24" fill="#18131B" stroke="#6A5572" stroke-width="2"/>
+  <path fill="#F5F1F6" fill-rule="evenodd" d="M96 102h16l30 65h-18l-6-15H90l-6 15H66l30-65Zm.5 35h15l-7.5-18-7.5 18Z"/>
   <text x="184" y="105" fill="#D3BAFF" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700" letter-spacing="1.8">UNOFFICIAL EXTENSION</text>
   <text x="184" y="140" fill="#F5F1F6" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="750">Artificial Analysis</text>
   <text x="184" y="171" fill="#F5F1F6" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="750">after dark.</text>

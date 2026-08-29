@@ -18,9 +18,14 @@ for (const size of [16, 32, 48, 128]) {
     .toFile(path.join(generatedDir, "icons", `icon-${size}.png`));
 }
 
+await sharp(iconSource, { density: 384 })
+  .resize(128, 128)
+  .png({ compressionLevel: 9 })
+  .toFile(path.join(projectRoot, "store-assets", "icon-128.png"));
+
 await sharp(promoSource, { density: 192 })
   .resize(440, 280)
   .png({ compressionLevel: 9 })
   .toFile(path.join(projectRoot, "store-assets", "promo-tile-440x280.png"));
 
-console.log("Generated extension icons and store promotional tile.");
+console.log("Generated upload icon, extension icons, and store promotional tile.");

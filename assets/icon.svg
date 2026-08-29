@@ -1,20 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Crescent moon and analysis bars">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Uppercase letter A on a dark plum background">
   <defs>
-    <linearGradient id="bg" x1="18" y1="12" x2="112" y2="118" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2B2230"/>
+    <linearGradient id="bg" x1="24" y1="18" x2="106" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34293A"/>
+      <stop offset=".55" stop-color="#211A25"/>
       <stop offset="1" stop-color="#100D12"/>
     </linearGradient>
-    <linearGradient id="moon" x1="33" y1="24" x2="90" y2="95" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D3BAFF"/>
-      <stop offset="1" stop-color="#8E5FE8"/>
+    <linearGradient id="letter" x1="40" y1="35" x2="91" y2="95" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D3BAFF"/>
     </linearGradient>
   </defs>
-  <g transform="translate(16 16) scale(.75)">
-    <rect width="128" height="128" rx="28" fill="url(#bg)"/>
-    <rect x=".75" y=".75" width="126.5" height="126.5" rx="27.25" fill="none" stroke="#59475F" stroke-width="1.5"/>
-    <path d="M80.8 78.3c-22.2 2.8-38.2-18.7-27.7-37.2a33.5 33.5 0 1 0 38 50.8 33.3 33.3 0 0 0 8.2-21.5 25.6 25.6 0 0 1-18.5 7.9Z" fill="url(#moon)"/>
-    <rect x="72" y="72" width="8" height="26" rx="4" fill="#C7FF73"/>
-    <rect x="85" y="62" width="8" height="36" rx="4" fill="#A8F7DF"/>
-    <rect x="98" y="48" width="8" height="50" rx="4" fill="#FF8254"/>
-  </g>
+
+  <!-- Chrome artwork occupies 96x96 with 16px transparent padding. -->
+  <rect x="16" y="16" width="96" height="96" rx="22" fill="url(#bg)"/>
+  <rect x="16.75" y="16.75" width="94.5" height="94.5" rx="21.25" fill="none" stroke="#6A5572" stroke-width="1.5"/>
+
+  <!-- A literal uppercase A, drawn as geometry rather than a font glyph. -->
+  <path fill="url(#letter)" fill-rule="evenodd" d="M57 35h14l26 59H81l-5.8-14H52.8L47 94H31l26-59Zm1.2 32h11.6L64 52.8 58.2 67Z"/>
 </svg>

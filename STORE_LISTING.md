@@ -54,7 +54,7 @@ No user data is collected or used.
 
 ## Graphic assets
 
-- Store icon: `generated-assets/icons/icon-128.png`
+- Store icon: `store-assets/icon-128.png`
 - Small promotional tile: `store-assets/promo-tile-440x280.png`
 - Screenshots: `store-assets/screenshots/*-1280x800.png`
 
