@@ -36,6 +36,11 @@ test("themes every representative public template without bright neutral panels"
     const brightPanels = await findBrightNeutralPanels(page);
     expect(brightPanels, `${route} contains unintended light panels`).toEqual([]);
 
+    const blackChartLabels = await page
+      .locator('.recharts-label-list text[dominant-baseline="auto"]')
+      .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).fill === "rgb(0, 0, 0)").map((node) => node.textContent));
+    expect(blackChartLabels, `${route} contains black chart labels on dark surfaces`).toEqual([]);
+
     const filteredMedia = await page.locator("main img, main picture, main video, main canvas").evaluateAll((nodes) =>
       nodes.filter((node) => getComputedStyle(node).filter !== "none").slice(0, 10).map((node) => ({
         tag: node.tagName,

@@ -412,6 +412,13 @@
     color: var(--aad-text-muted) !important;
   }
 
+  /* AA renders values above short bars as unclassed, hard-coded black SVG text. */
+  html[data-aad-theme="dark"] .recharts-label-list text[fill="black"][dominant-baseline="auto"],
+  html[data-aad-theme="dark"] .recharts-label-list text[fill="#000"][dominant-baseline="auto"],
+  html[data-aad-theme="dark"] .recharts-label-list text[fill="#000000"][dominant-baseline="auto"] {
+    fill: var(--aad-text-muted) !important;
+  }
+
   html[data-aad-theme="dark"] .recharts-default-tooltip,
   html[data-aad-theme="dark"] .recharts-tooltip-wrapper > div {
     color: var(--aad-text) !important;
