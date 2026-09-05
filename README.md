@@ -56,6 +56,25 @@ For a signed CRX intended only for local or non-store distribution, keep the sig
 just crx /absolute/path/to/private-key.pem
 ```
 
+## Publishing
+
+One-time setup:
+
+```sh
+just ready
+```
+
+It checks prerequisites, walks through creating a Google Cloud OAuth client for the Chrome Web Store API, obtains a refresh token in the browser, writes it to a gitignored `.env`, and verifies it against the live store item.
+
+Per release:
+
+```sh
+just publish 0.1.1        # full gate: unit, live route audit, e2e, package
+just publish 0.1.1 fast   # unit + package only
+```
+
+`publish` refuses a dirty tree, a branch other than `main`, an out-of-sync `origin/main`, an existing tag, or a store submission that is still under review. It then bumps `package.json`, `package-lock.json`, and `src/manifest.json`; commits `Release X.Y.Z`; tags `vX.Y.Z`; uploads and submits the ZIP to the Chrome Web Store (it publishes automatically after Google's review); pushes; and creates a GitHub Release with the ZIP attached. If a step fails after the release commit, it prints the exact commands to resume or undo.
+
 ## Design rules
 
 - No page-wide `filter`, inversion, brightness transform, or media recoloring.

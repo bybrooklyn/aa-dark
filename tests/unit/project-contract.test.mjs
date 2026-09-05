@@ -3,8 +3,13 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const manifest = JSON.parse(await readFile(new URL("../../src/manifest.json", import.meta.url), "utf8"));
+const pkg = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
 const preflight = await readFile(new URL("../../src/preflight.css", import.meta.url), "utf8");
 const theme = await readFile(new URL("../../src/theme.css", import.meta.url), "utf8");
+
+test("manifest and package versions match", () => {
+  assert.equal(manifest.version, pkg.version, "just publish bumps both; keep them in sync by hand otherwise");
+});
 
 test("manifest is a minimal, exact-host, always-on MV3 content extension", () => {
   assert.equal(manifest.manifest_version, 3);

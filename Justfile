@@ -1,4 +1,5 @@
 set shell := ["zsh", "-cu"]
+set dotenv-load := true
 
 # Build the Chrome Web Store upload artifact.
 default: webstore
@@ -59,3 +60,66 @@ crx key:
     mv -f "$root/dist.crx" "releases/artificial-analysis-dark-${version}.crx"
     echo "Local signed CRX: releases/artificial-analysis-dark-${version}.crx"
     echo "Do not upload this CRX to the Chrome Web Store; upload the ZIP from `just webstore`."
+
+# One-time setup: prerequisites, Google OAuth client, Web Store refresh token, .env.
+ready:
+    node scripts/ready.mjs
+
+# Release X.Y.Z: bump, gate, commit, tag, Chrome Web Store upload + publish, push, GitHub Release.
+# `just publish 0.1.1` runs the full gate; `just publish 0.1.1 fast` skips the live-site checks.
+publish version mode="full":
+    #!/usr/bin/env zsh
+    set -euo pipefail
+    cd "{{ justfile_directory() }}"
+    version="{{ version }}"
+    mode="{{ mode }}"
+    die() { echo "publish: $*" >&2; exit 1; }
+
+    # Preflight: nothing is modified until every check passes.
+    [[ "$version" =~ '^[0-9]+\.[0-9]+\.[0-9]+$' ]] || die "version must look like 1.2.3"
+    [[ "$mode" == full || "$mode" == fast ]] || die "mode must be full or fast"
+    [[ -z "$(git status --porcelain)" ]] || die "working tree is not clean"
+    [[ "$(git branch --show-current)" == main ]] || die "not on main"
+    git fetch --quiet origin
+    git merge-base --is-ancestor origin/main HEAD || die "main is behind or has diverged from origin/main; pull first"
+    git rev-parse --quiet --verify "refs/tags/v$version" >/dev/null && die "tag v$version already exists"
+    [[ -z "$(git ls-remote --tags origin "refs/tags/v$version")" ]] || die "tag v$version already exists on origin"
+    [[ -n "${CWS_CLIENT_ID:-}" && -n "${CWS_CLIENT_SECRET:-}" && -n "${CWS_REFRESH_TOKEN:-}" ]] || die "no Web Store credentials in .env; run: just ready"
+    gh auth status >/dev/null 2>&1 || die "gh is not authenticated; run: gh auth login"
+    node scripts/cws.mjs check "$version"
+
+    # Bump package.json + lock via npm, and the manifest via node.
+    npm version "$version" --no-git-tag-version >/dev/null
+    node -e 'const fs = require("fs"); const p = "src/manifest.json"; const m = JSON.parse(fs.readFileSync(p, "utf8")); m.version = process.argv[1]; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");' "$version"
+
+    # Gate. The full gate refreshes store-assets/screenshots, which join the release commit.
+    if [[ "$mode" == full ]]; then npm run validate; else npm test && npm run package; fi
+    archive="releases/artificial-analysis-dark-${version}.zip"
+    test -f "$archive" || die "expected $archive"
+
+    # Release commit and tag, then the remaining steps; a failure prints how to resume or undo.
+    steps=(
+      "node scripts/cws.mjs upload $archive"
+      "node scripts/cws.mjs publish"
+      "git push origin main v$version"
+      "gh release create v$version $archive --title v$version --generate-notes"
+    )
+    step=0
+    recover() {
+      (( step > 0 )) || return 0
+      echo "publish: step $step failed. Remaining steps:" >&2
+      for remaining in "${(@)steps[step,-1]}"; do echo "  $remaining" >&2; done
+      (( step == 1 )) && echo "  or undo the release commit: git tag -d v$version && git reset --soft HEAD~1" >&2
+      return 0
+    }
+    trap recover ERR
+    git add package.json package-lock.json src/manifest.json store-assets/screenshots
+    git commit --quiet -m "Release $version"
+    git tag -a "v$version" -m "v$version"
+    for command in "${steps[@]}"; do step=$((step + 1)); eval "$command"; done
+
+    echo
+    echo "Released $version. Store review is pending; it publishes automatically on approval."
+    shasum -a 256 "$archive"
+    echo "Dashboard: https://chrome.google.com/webstore/devconsole/55307e7a-0630-4d79-a100-a029141ee6db/fncnoagfclehaljfppnjpngaingeoimm"
+    gh release view "v$version" --json url --jq .url

@@ -6,3 +6,4 @@ playwright-report/
 releases/*.zip
 releases/*.crx
 .DS_Store
+.env
