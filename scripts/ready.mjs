@@ -28,6 +28,7 @@ const rl = readline.createInterface({
   output: new Writable({ write(chunk, _encoding, callback) { if (!muted) process.stdout.write(chunk); callback(); } }),
   terminal: true,
 });
+rl.on("SIGINT", () => fail("Aborted. Nothing was written; re-run: just ready"));
 rl.on("close", () => { if (!finished) fail("Input closed before setup finished."); });
 const ask = (question) => new Promise((resolve) => rl.question(question, (answer) => resolve(answer.trim())));
 
@@ -56,6 +57,8 @@ Step 2/4 · Google Cloud OAuth client (one time, in the browser)
      (In "Testing" status every refresh token expires after 7 days.)
   4. Credentials → Create credentials → OAuth client ID →
      Application type "Desktop app" → Create. Copy the Client ID and secret.
+     Not "Web application", "Chrome Extension", iOS, or Android: those reject
+     the loopback redirect with "Access blocked … Error 400: invalid_request".
   5. Sign in during consent with the Google account that owns the extension
      in the Web Store Developer Dashboard. It must have 2-Step Verification on.
 
@@ -139,6 +142,7 @@ function authorize(clientId, clientSecret) {
         state,
       });
       console.log(`\nOpening Google's consent screen. If nothing opens, visit:\n${consent.href}\n`);
+      console.log('If Google shows "Access blocked … Error 400: invalid_request", the client is not a\n"Desktop app": press Ctrl-C, create one (Credentials → Create credentials → OAuth client ID\n→ Desktop app), and re-run: just ready\n');
       spawnSync("open", [consent.href], { stdio: "ignore" });
     });
   });
