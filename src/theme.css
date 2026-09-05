@@ -97,6 +97,11 @@
     background-color: var(--aad-surface-3) !important;
   }
 
+  /* Hairline dividers drawn as 1px filled divs. */
+  html[data-aad-theme="dark"] .bg-neutral-300 {
+    background-color: var(--aad-border-strong) !important;
+  }
+
   html[data-aad-theme="dark"] [class~="bg-neutral-50/50"],
   html[data-aad-theme="dark"] [class~="bg-neutral-100/50"],
   html[data-aad-theme="dark"] [class~="bg-neutral-100/70"],
@@ -123,31 +128,106 @@
 
   /* Tailwind's pale notification families need dark, hue-preserving surfaces. */
   html[data-aad-theme="dark"] .bg-purple-50,
-  html[data-aad-theme="dark"] .bg-violet-50 {
+  html[data-aad-theme="dark"] .bg-purple-100,
+  html[data-aad-theme="dark"] .bg-violet-50,
+  html[data-aad-theme="dark"] .bg-violet-100,
+  html[data-aad-theme="dark"] .bg-fuchsia-50,
+  html[data-aad-theme="dark"] .bg-fuchsia-100 {
     background-color: #2d233a !important;
   }
 
   html[data-aad-theme="dark"] .bg-blue-50,
+  html[data-aad-theme="dark"] .bg-blue-100,
   html[data-aad-theme="dark"] .bg-sky-50,
-  html[data-aad-theme="dark"] .bg-cyan-50 {
+  html[data-aad-theme="dark"] .bg-sky-100,
+  html[data-aad-theme="dark"] .bg-cyan-50,
+  html[data-aad-theme="dark"] .bg-cyan-100 {
     background-color: #172b39 !important;
   }
 
+  html[data-aad-theme="dark"] .bg-indigo-50,
+  html[data-aad-theme="dark"] .bg-indigo-100 {
+    background-color: #1f2140 !important;
+  }
+
+  html[data-aad-theme="dark"] [class~="hover:bg-indigo-100"]:hover {
+    background-color: #292c52 !important;
+  }
+
   html[data-aad-theme="dark"] .bg-green-50,
+  html[data-aad-theme="dark"] .bg-green-100,
   html[data-aad-theme="dark"] .bg-emerald-50,
-  html[data-aad-theme="dark"] .bg-teal-50 {
+  html[data-aad-theme="dark"] .bg-emerald-100,
+  html[data-aad-theme="dark"] .bg-teal-50,
+  html[data-aad-theme="dark"] .bg-teal-100,
+  html[data-aad-theme="dark"] .bg-lime-50,
+  html[data-aad-theme="dark"] .bg-lime-100 {
     background-color: #153129 !important;
   }
 
   html[data-aad-theme="dark"] .bg-red-50,
-  html[data-aad-theme="dark"] .bg-rose-50 {
+  html[data-aad-theme="dark"] .bg-red-100,
+  html[data-aad-theme="dark"] .bg-rose-50,
+  html[data-aad-theme="dark"] .bg-rose-100,
+  html[data-aad-theme="dark"] .bg-pink-50,
+  html[data-aad-theme="dark"] .bg-pink-100 {
     background-color: #3a2028 !important;
   }
 
   html[data-aad-theme="dark"] .bg-amber-50,
+  html[data-aad-theme="dark"] .bg-amber-100,
   html[data-aad-theme="dark"] .bg-yellow-50,
-  html[data-aad-theme="dark"] .bg-orange-50 {
+  html[data-aad-theme="dark"] .bg-yellow-100,
+  html[data-aad-theme="dark"] .bg-orange-50,
+  html[data-aad-theme="dark"] .bg-orange-100 {
     background-color: #352a18 !important;
+  }
+
+  /* Dark -700/-800 text pairs with those pale backgrounds upstream; lift it to match. */
+  html[data-aad-theme="dark"] .text-green-700,
+  html[data-aad-theme="dark"] .text-green-800,
+  html[data-aad-theme="dark"] .text-emerald-700,
+  html[data-aad-theme="dark"] .text-emerald-800,
+  html[data-aad-theme="dark"] .text-teal-700,
+  html[data-aad-theme="dark"] .text-teal-800 {
+    color: var(--aad-success) !important;
+  }
+
+  html[data-aad-theme="dark"] .text-amber-700,
+  html[data-aad-theme="dark"] .text-amber-800,
+  html[data-aad-theme="dark"] .text-yellow-700,
+  html[data-aad-theme="dark"] .text-yellow-800,
+  html[data-aad-theme="dark"] .text-orange-700,
+  html[data-aad-theme="dark"] .text-orange-800 {
+    color: var(--aad-warning) !important;
+  }
+
+  html[data-aad-theme="dark"] .text-red-700,
+  html[data-aad-theme="dark"] .text-red-800,
+  html[data-aad-theme="dark"] .text-rose-700,
+  html[data-aad-theme="dark"] .text-rose-800 {
+    color: var(--aad-danger) !important;
+  }
+
+  html[data-aad-theme="dark"] .text-blue-700,
+  html[data-aad-theme="dark"] .text-blue-800,
+  html[data-aad-theme="dark"] .text-sky-700,
+  html[data-aad-theme="dark"] .text-sky-800 {
+    color: #8ec7ff !important;
+  }
+
+  html[data-aad-theme="dark"] .text-indigo-500,
+  html[data-aad-theme="dark"] .text-indigo-600,
+  html[data-aad-theme="dark"] .text-indigo-700,
+  html[data-aad-theme="dark"] [class~="[&_span]:text-indigo-500"] span {
+    color: #b3bcff !important;
+  }
+
+  html[data-aad-theme="dark"] .text-purple-700,
+  html[data-aad-theme="dark"] .text-purple-800,
+  html[data-aad-theme="dark"] .text-violet-700,
+  html[data-aad-theme="dark"] .text-violet-800 {
+    color: var(--aad-purple-soft) !important;
   }
 
   /* Surface-like AA brand tokens are tinted, not desaturated. */
@@ -177,6 +257,25 @@
   html[data-aad-theme="dark"] .bg-black,
   html[data-aad-theme="dark"] .bg-neutral-900 {
     forced-color-adjust: none;
+  }
+
+  /* Black fills on a near-black canvas need an edge: nav pill, swatches, cards. */
+  html[data-aad-theme="dark"] .bg-black,
+  html[data-aad-theme="dark"] .bg-neutral-900 {
+    outline: 1px solid var(--aad-border-strong);
+    outline-offset: -1px;
+  }
+
+  /* Bright brand fills inherit black text upstream; keep it dark here too. */
+  html[data-aad-theme="dark"] .bg-brand-lime:not(.text-white),
+  html[data-aad-theme="dark"] .bg-brand-yellow:not(.text-white) {
+    color: #0b090c;
+  }
+
+  /* Tab triggers that force black text when active. */
+  html[data-aad-theme="dark"] [class~="data-[state=active]:!text-black"][data-state="active"],
+  html[data-aad-theme="dark"] [class~="data-[state=active]:text-black"][data-state="active"] {
+    color: var(--aad-text) !important;
   }
 
   html[data-aad-theme="dark"] .bg-brand-lime .text-black,
@@ -412,11 +511,36 @@
     color: var(--aad-text-muted) !important;
   }
 
-  /* AA renders values above short bars as unclassed, hard-coded black SVG text. */
-  html[data-aad-theme="dark"] .recharts-label-list text[fill="black"][dominant-baseline="auto"],
-  html[data-aad-theme="dark"] .recharts-label-list text[fill="#000"][dominant-baseline="auto"],
-  html[data-aad-theme="dark"] .recharts-label-list text[fill="#000000"][dominant-baseline="auto"] {
+  /* AA renders values beside bars as unclassed SVG text: hard-coded black, or
+     no fill at all (SVG's default is black). Readable in-bar labels upstream
+     are white; the only black in-bar text is a 25%-opacity shadow copy. */
+  html[data-aad-theme="dark"] .recharts-surface text[fill="black"],
+  html[data-aad-theme="dark"] .recharts-surface text[fill="#000"],
+  html[data-aad-theme="dark"] .recharts-surface text[fill="#000000"],
+  html[data-aad-theme="dark"] .recharts-label-list:not([fill]) text:not([fill]) {
     fill: var(--aad-text-muted) !important;
+  }
+
+  /* Scatter point names: dark text with a white halo. Invert the halo, not the data. */
+  html[data-aad-theme="dark"] .recharts-surface text[stroke="white"][paint-order="stroke"] {
+    fill: var(--aad-text) !important;
+    stroke: var(--aad-canvas) !important;
+  }
+
+  /* Black data series (e.g. "Proprietary") keep their fill but gain an edge. */
+  html[data-aad-theme="dark"] .recharts-surface path[fill="#000"],
+  html[data-aad-theme="dark"] .recharts-surface path[fill="black"],
+  html[data-aad-theme="dark"] .recharts-surface path[fill="#000000"],
+  html[data-aad-theme="dark"] .recharts-surface rect[fill="#000"],
+  html[data-aad-theme="dark"] .recharts-surface rect[fill="black"],
+  html[data-aad-theme="dark"] .recharts-surface rect[fill="#000000"] {
+    stroke: var(--aad-border-strong);
+    stroke-width: 1;
+  }
+
+  /* Chart watermark: black wordmark paths beside the purple mark. */
+  html[data-aad-theme="dark"] svg[viewBox="0 0 402 44"] path[fill="#000"] {
+    fill: var(--aad-text-subtle);
   }
 
   html[data-aad-theme="dark"] .recharts-default-tooltip,

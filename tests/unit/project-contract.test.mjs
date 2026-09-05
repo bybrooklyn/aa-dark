@@ -26,7 +26,8 @@ test("theme is component-aware and never applies inversion", () => {
   assert.doesNotMatch(theme, /html\[data-aad-theme[^}]+\]\s+\*/);
   assert.match(theme, /\.recharts-cartesian-grid/);
   assert.match(theme, /\.recharts-default-tooltip/);
-  assert.match(theme, /\.recharts-label-list text\[fill="black"\]/);
+  assert.match(theme, /\.recharts-surface text\[fill="black"\]/);
+  assert.match(theme, /\.recharts-label-list:not\(\[fill\]\) text:not\(\[fill\]\)/);
   assert.doesNotMatch(theme, /\.recharts-(?:line-curve|area-curve|bar-rectangle|scatter-symbol)[^{]*\{/);
   assert.match(theme, /main video[\s\S]*filter:\s*none/);
   assert.match(theme, /img\[src\*="\/img\/logos\/"\]/);
