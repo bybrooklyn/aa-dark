@@ -74,9 +74,13 @@ if (existing.CWS_CLIENT_ID && existing.CWS_CLIENT_SECRET && existing.CWS_REFRESH
   credentials = existing;
 } else {
   const clientId = await ask("OAuth Client ID: ");
+  if (!clientId.endsWith(".apps.googleusercontent.com")) fail("Client IDs end with .apps.googleusercontent.com; check the paste.");
   const clientSecret = await askHidden("OAuth Client secret (input hidden): ");
-  if (!clientId || !clientSecret) fail("Client ID and Client secret are both required.");
-  const refreshToken = await authorize(clientId, clientSecret);
+  if (!clientSecret.startsWith("GOCSPX-")) {
+    fail(`Client secrets start with GOCSPX-; received ${clientSecret.length} characters starting with "${clientSecret.slice(0, 3)}". Copy it from Credentials → the client → Client secret (or "Add secret" if it is no longer shown).`);
+  }
+  console.log(`  received ${clientSecret.length} characters`);
+  const refreshToken = await authorize(clientId, clientSecret).catch((error) => fail(error.message));
   credentials = { CWS_CLIENT_ID: clientId, CWS_CLIENT_SECRET: clientSecret, CWS_REFRESH_TOKEN: refreshToken };
   writeFileSync(envPath, `${Object.entries(credentials).map(([key, value]) => `${key}=${value}`).join("\n")}\n`, { mode: 0o600 });
   chmodSync(envPath, 0o600);
