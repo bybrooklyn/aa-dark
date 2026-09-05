@@ -19,12 +19,16 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const envPath = path.join(projectRoot, ".env");
 const SCOPE = "https://www.googleapis.com/auth/chromewebstore";
 
+if (!process.stdin.isTTY) fail("just ready is interactive: run it in a terminal window, not through a non-interactive runner.");
+
 let muted = false;
+let finished = false;
 const rl = readline.createInterface({
   input: process.stdin,
   output: new Writable({ write(chunk, _encoding, callback) { if (!muted) process.stdout.write(chunk); callback(); } }),
   terminal: true,
 });
+rl.on("close", () => { if (!finished) fail("Input closed before setup finished."); });
 const ask = (question) => new Promise((resolve) => rl.question(question, (answer) => resolve(answer.trim())));
 
 console.log("\nStep 1/4 · Prerequisites\n");
@@ -77,6 +81,7 @@ if (existing.CWS_CLIENT_ID && existing.CWS_CLIENT_SECRET && existing.CWS_REFRESH
 }
 
 console.log("\nStep 4/4 · Verify\n");
+finished = true;
 rl.close();
 const verify = spawnSync(process.execPath, [path.join(projectRoot, "scripts", "cws.mjs"), "check"], {
   cwd: projectRoot,
