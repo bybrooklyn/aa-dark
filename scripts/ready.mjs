@@ -35,15 +35,16 @@ const ask = (question) => new Promise((resolve) => rl.question(question, (answer
 console.log("\nStep 1/4 · Prerequisites\n");
 let failures = 0;
 check(Number(process.versions.node.split(".")[0]) >= 20, `Node ${process.versions.node}`, "Node 20 or newer is required.");
+check(run(["bun", "--version"]), "bun", "Install bun: https://bun.sh");
 check(run(["git", "config", "user.name"]) && run(["git", "config", "user.email"]), "git identity", "Set git config user.name and user.email.");
 check(run(["git", "push", "--dry-run", "origin", "main"]), "push access to origin/main", "Fix git credentials for origin (or sync main) first.");
 check(run(["gh", "auth", "status"]), "gh authenticated (GitHub Releases)", "Run: gh auth login");
 const playwrightCache = path.join(homedir(), "Library", "Caches", "ms-playwright");
 let chromium = existsSync(playwrightCache) && readdirSync(playwrightCache).some((name) => name.startsWith("chromium-"));
 if (!chromium && (await ask("Playwright Chromium is missing (the full release gate needs it). Install now? [Y/n] ")).toLowerCase() !== "n") {
-  chromium = run(["npx", "playwright", "install", "chromium"], "inherit");
+  chromium = run(["bunx", "playwright", "install", "chromium"], "inherit");
 }
-check(chromium, "Playwright Chromium", "Run: npx playwright install chromium");
+check(chromium, "Playwright Chromium", "Run: bunx playwright install chromium");
 check(readFileSync(path.join(projectRoot, ".gitignore"), "utf8").split(/\r?\n/).includes(".env"), ".env is gitignored", "Add .env to .gitignore before continuing.");
 if (failures > 0) fail("Fix the items above, then re-run: just ready");
 

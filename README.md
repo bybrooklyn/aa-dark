@@ -11,8 +11,8 @@ This project is independent and is not affiliated with, endorsed by, or sponsore
 1. Install dependencies and build:
 
    ```sh
-   npm install
-   npm run build
+   bun install
+   bun run build
    ```
 
 2. Open `chrome://extensions` in a Chromium-based browser.
@@ -25,17 +25,17 @@ The theme is intentionally always on. Disable the extension from the browser's e
 ## Development
 
 ```sh
-npm test               # route, manifest, theme, and contrast contracts
-npm run audit:live     # classify every route in all public sitemaps
-npm run test:e2e       # load the real extension in bundled Chromium
-npm run package        # produce the Chrome Web Store upload ZIP
-npm run validate       # run the complete release gate
+bun run test           # route, manifest, theme, and contrast contracts
+bun run audit:live     # classify every route in all public sitemaps
+bun run test:e2e       # load the real extension in bundled Chromium
+bun run package        # produce the Chrome Web Store upload ZIP
+bun run validate       # run the complete release gate
 ```
 
 Playwright's bundled Chromium must be installed once:
 
 ```sh
-npx playwright install chromium
+bunx playwright install chromium
 ```
 
 The browser suite uses the live site. A failure can mean either a regression in this extension or deliberate upstream markup changes; investigate rather than updating selectors or allowlists blindly.
@@ -69,11 +69,12 @@ It checks prerequisites, walks through creating a Google Cloud OAuth client for 
 Per release:
 
 ```sh
-just publish 0.1.1        # full gate: unit, live route audit, e2e, package
-just publish 0.1.1 fast   # unit + package only
+just publish 0.1.1            # full gate: unit, live route audit, e2e, package
+just publish 0.1.1 fast       # unit + package only
+just publish 0.1.1 --force    # release even if the working tree is not clean
 ```
 
-`publish` refuses a dirty tree, a branch other than `main`, an out-of-sync `origin/main`, an existing tag, or a store submission that is still under review. It then bumps `package.json`, `package-lock.json`, and `src/manifest.json`; commits `Release X.Y.Z`; tags `vX.Y.Z`; uploads and submits the ZIP to the Chrome Web Store (it publishes automatically after Google's review); pushes; and creates a GitHub Release with the ZIP attached. If a step fails after the release commit, it prints the exact commands to resume or undo.
+`publish` refuses a dirty tree (unless `--force`), a branch other than `main`, a `main` that is behind `origin/main`, an existing tag, or a store submission that is still under review. It then bumps `package.json` and `src/manifest.json`; commits `Release X.Y.Z`; tags `vX.Y.Z`; uploads and submits the ZIP to the Chrome Web Store (it publishes automatically after Google's review); pushes; and creates a GitHub Release with the ZIP attached. If the gate fails, the bump is reverted; if a later step fails, it prints the exact commands to resume or undo.
 
 ## Design rules
 

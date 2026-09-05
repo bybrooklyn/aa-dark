@@ -6,29 +6,29 @@ default: webstore
 
 # Install exactly the locked development dependencies.
 install:
-    npm ci
+    bun install --frozen-lockfile
 
 # Build the unpacked extension in dist/.
 build:
-    npm run build
+    bun run build
 
 # Run fast local contracts.
 test:
-    npm test
+    bun run test
 
 # Verify every route in Artificial Analysis' public sitemaps is classified.
 audit:
-    npm run audit:live
+    bun run audit:live
 
 # Run the complete unit, live-site, Chromium, asset, and package gate.
 validate:
-    npm run validate
+    bun run validate
 
 # Build and verify the ZIP accepted by the Chrome Web Store dashboard.
 webstore:
     #!/usr/bin/env zsh
     set -euo pipefail
-    npm run package
+    bun run package
     version="$(node -e 'const fs=require("fs"); console.log(JSON.parse(fs.readFileSync("src/manifest.json", "utf8")).version)')"
     archive="releases/artificial-analysis-dark-${version}.zip"
     test -f "$archive"
@@ -53,7 +53,7 @@ crx key:
     chrome_bin="${CHROME_BIN:-/Applications/Chromium.app/Contents/MacOS/Chromium}"
     test -x "$chrome_bin" || { echo "Set CHROME_BIN to a Chromium executable." >&2; exit 1; }
     cd "$root"
-    npm run build
+    bun run build
     "$chrome_bin" --pack-extension="$root/dist" --pack-extension-key="$key_path"
     version="$(node -e 'const fs=require("fs"); console.log(JSON.parse(fs.readFileSync("src/manifest.json", "utf8")).version)')"
     mkdir -p releases
@@ -66,19 +66,28 @@ ready:
     node scripts/ready.mjs
 
 # Release X.Y.Z: bump, gate, commit, tag, Chrome Web Store upload + publish, push, GitHub Release.
-# `just publish 0.1.1` runs the full gate; `just publish 0.1.1 fast` skips the live-site checks.
-publish version mode="full":
+# Options after the version: `fast` skips the live-site checks; `--force` skips the clean-tree check.
+publish version *options:
     #!/usr/bin/env zsh
     set -euo pipefail
     cd "{{ justfile_directory() }}"
     version="{{ version }}"
-    mode="{{ mode }}"
+    mode=full
+    force=0
+    for option in {{ options }}; do
+      case "$option" in
+        full|fast) mode="$option" ;;
+        --force|force) force=1 ;;
+        *) echo "publish: unknown option '$option' (use fast, full, --force)" >&2; exit 1 ;;
+      esac
+    done
     die() { echo "publish: $*" >&2; exit 1; }
 
     # Preflight: nothing is modified until every check passes.
     [[ "$version" =~ '^[0-9]+\.[0-9]+\.[0-9]+$' ]] || die "version must look like 1.2.3"
-    [[ "$mode" == full || "$mode" == fast ]] || die "mode must be full or fast"
-    [[ -z "$(git status --porcelain)" ]] || die "working tree is not clean"
+    if (( ! force )); then
+      [[ -z "$(git status --porcelain)" ]] || die "working tree is not clean (add --force to release anyway)"
+    fi
     [[ "$(git branch --show-current)" == main ]] || die "not on main"
     git fetch --quiet origin
     git merge-base --is-ancestor origin/main HEAD || die "main is behind or has diverged from origin/main; pull first"
@@ -88,32 +97,39 @@ publish version mode="full":
     gh auth status >/dev/null 2>&1 || die "gh is not authenticated; run: gh auth login"
     node scripts/cws.mjs check "$version"
 
-    # Bump package.json + lock via npm, and the manifest via node.
-    npm version "$version" --no-git-tag-version >/dev/null
-    node -e 'const fs = require("fs"); const p = "src/manifest.json"; const m = JSON.parse(fs.readFileSync(p, "utf8")); m.version = process.argv[1]; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");' "$version"
-
-    # Gate. The full gate refreshes store-assets/screenshots, which join the release commit.
-    if [[ "$mode" == full ]]; then npm run validate; else npm test && npm run package; fi
+    # From here on, a failure prints how to recover. Before the release commit that means
+    # reverting the bump (unless --force, when the tree was already yours to sort out).
     archive="releases/artificial-analysis-dark-${version}.zip"
-    test -f "$archive" || die "expected $archive"
-
-    # Release commit and tag, then the remaining steps; a failure prints how to resume or undo.
     steps=(
       "node scripts/cws.mjs upload $archive"
       "node scripts/cws.mjs publish"
       "git push origin main v$version"
       "gh release create v$version $archive --title v$version --generate-notes"
     )
+    bumped=0
     step=0
     recover() {
-      (( step > 0 )) || return 0
-      echo "publish: step $step failed. Remaining steps:" >&2
-      for remaining in "${(@)steps[step,-1]}"; do echo "  $remaining" >&2; done
-      (( step == 1 )) && echo "  or undo the release commit: git tag -d v$version && git reset --soft HEAD~1" >&2
+      if (( step > 0 )); then
+        echo "publish: step $step failed. Remaining steps:" >&2
+        for remaining in "${(@)steps[step,-1]}"; do echo "  $remaining" >&2; done
+        (( step == 1 )) && echo "  or undo the release commit: git tag -d v$version && git reset --soft HEAD~1" >&2
+      elif (( bumped && ! force )); then
+        git checkout --quiet -- package.json src/manifest.json store-assets/screenshots
+        echo "publish: gate failed; reverted the version bump. Fix the failure and re-run." >&2
+      fi
       return 0
     }
     trap recover ERR
-    git add package.json package-lock.json src/manifest.json store-assets/screenshots
+
+    # Bump package.json and the manifest together.
+    node -e 'const fs = require("fs"); for (const p of ["package.json", "src/manifest.json"]) { const m = JSON.parse(fs.readFileSync(p, "utf8")); m.version = process.argv[1]; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n"); }' "$version"
+    bumped=1
+
+    # Gate. The full gate refreshes store-assets/screenshots, which join the release commit.
+    if [[ "$mode" == full ]]; then bun run validate; else bun run test; bun run package; fi
+    test -f "$archive" || die "expected $archive"
+
+    git add package.json src/manifest.json store-assets/screenshots
     git commit --quiet -m "Release $version"
     git tag -a "v$version" -m "v$version"
     for command in "${steps[@]}"; do step=$((step + 1)); eval "$command"; done
