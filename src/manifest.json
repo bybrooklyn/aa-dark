@@ -19,9 +19,6 @@
         "preflight.css",
         "theme.css"
       ],
-      "js": [
-        "content.js"
-      ],
       "run_at": "document_start",
       "all_frames": false
     }

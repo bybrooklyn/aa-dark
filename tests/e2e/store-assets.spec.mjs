@@ -19,7 +19,7 @@ test("captures current store screenshots from the real themed extension", async 
   ]) {
     const response = await page.goto(`https://artificialanalysis.ai${route}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     expect(response?.status()).toBeLessThan(400);
-    await expect(page.locator("html")).toHaveAttribute("data-aad-theme", "dark");
+    await expect(page.locator("html")).toHaveCSS("color-scheme", "dark");
     if (readySelector) await expect(page.locator(readySelector).first()).toBeAttached({ timeout: 30_000 });
     await page.waitForTimeout(1_200);
     await page.screenshot({ path: path.join(screenshotsDir, `${name}-1280x800.png`), animations: "disabled" });

@@ -2,7 +2,7 @@
 
 A site-specific Chromium extension that gives [Artificial Analysis](https://artificialanalysis.ai/) a carefully designed charcoal-and-plum dark theme.
 
-This is not an inversion filter. It themes the site's semantic tokens and known components, preserves chart series and media, treats logos for dark-background legibility, and audits the live public route catalog for drift.
+This is not an inversion filter. It is two CSS files and nothing else: no JavaScript, no permissions. It re-points the site's own color tokens, themes its known components, preserves chart series and media, and treats logos for dark-background legibility.
 
 This project is independent and is not affiliated with, endorsed by, or sponsored by Artificial Analysis.
 
@@ -25,9 +25,8 @@ The theme is intentionally always on. Disable the extension from the browser's e
 ## Development
 
 ```sh
-bun run test           # route, manifest, theme, and contrast contracts
-bun run audit:live     # classify every route in all public sitemaps
-bun run test:e2e       # load the real extension in bundled Chromium
+bun run test           # manifest, theme, and contrast contracts
+bun run test:e2e       # load the real extension in bundled Chromium against the live site
 bun run package        # produce the Chrome Web Store upload ZIP
 bun run validate       # run the complete release gate
 ```
@@ -69,7 +68,7 @@ It checks prerequisites, walks through creating a Google Cloud OAuth client for 
 Per release:
 
 ```sh
-just publish 0.1.1            # full gate: unit, live route audit, e2e, package
+just publish 0.1.1            # full gate: unit, e2e, package
 just publish 0.1.1 fast       # unit + package only
 just publish 0.1.1 --force    # release even if the working tree is not clean
 ```
@@ -79,11 +78,12 @@ just publish 0.1.1 --force    # release even if the working tree is not clean
 ## Design rules
 
 - No page-wide `filter`, inversion, brightness transform, or media recoloring.
+- The site's own HSL tokens (`--neutral-*`, `--brand-*`, shadcn `--background`/`--card`/...) are re-pointed first, so every utility and hover/state variant built on them follows; only literal Tailwind colors get explicit rules.
 - Neutral surfaces are translated into a dark elevation system; AA's categorical and brand accents remain meaningful.
 - Recharts axes, grids, labels, legends, and tooltips are themed; data series remain untouched.
 - Article imagery, arena media, video, audio, and canvas content retain their original appearance.
 - Print output stays light, and forced-colors mode remains under operating-system control.
-- No settings, storage, analytics, remote code, or data transmission.
+- No JavaScript, settings, storage, analytics, remote code, or data transmission.
 
 ## License
 

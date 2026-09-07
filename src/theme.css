@@ -1,13 +1,21 @@
 /*
  * Artificial Analysis Dark
  *
- * This stylesheet deliberately targets the site's semantic tokens, known
- * Tailwind utilities, and component libraries. It does not invert the page or
- * force a single foreground/background pair onto every element.
+ * The site builds its neutral and brand palettes from HSL custom properties
+ * (--neutral-900, --brand-blue-light, ...) and its component colors from shadcn
+ * tokens (--background, --card, ...). This stylesheet re-points those tokens
+ * first, which themes every utility and variant built on them, and only then
+ * patches the literal Tailwind utilities (white, black, neutral-300/400/800/950,
+ * the colored families) that bypass them. It never inverts the page or touches
+ * media, and it leaves chart data series alone.
+ *
+ * Literal overrides carry a hover guard: they step aside while the element (or
+ * its .group) is hovered and carries a hover:/group-hover: color, so the site's
+ * own hover colors keep working.
  */
 
 @media screen {
-  html[data-aad-theme="dark"] {
+  html:root {
     --aad-canvas: #100d12;
     --aad-surface-1: #18131b;
     --aad-surface-2: #211a25;
@@ -24,26 +32,27 @@
     --aad-danger: #ff7c88;
     --aad-success: #8fe3c5;
     --aad-warning: #ffc56e;
+    --aad-info: #8ec7ff;
     --aad-code: #0c0a0e;
 
-    /* Artificial Analysis / shadcn semantic tokens. */
+    /* shadcn semantic tokens. */
     --background: 285 16% 6%;
     --foreground: 290 22% 96%;
     --border: 288 14% 24%;
+    --input: 288 14% 27%;
     --ring: 263 100% 80%;
-    --card: 289 17% 9%;
+    --card: 290 18% 12%;
     --card-foreground: 290 22% 96%;
     --popover: 290 18% 12%;
     --popover-foreground: 290 22% 96%;
-    --secondary: 290 17% 13%;
-    --secondary-foreground: 290 22% 94%;
-    --muted: 290 17% 13%;
-    --muted-foreground: 291 10% 72%;
-    --accent: 290 17% 16%;
+    --secondary: 290 17% 16%;
+    --secondary-foreground: 290 22% 96%;
+    --muted: 290 17% 16%;
+    --muted-foreground: 284 11% 74%;
+    --accent: 289 17% 19%;
     --accent-foreground: 290 22% 96%;
-    --destructive: 354 84% 68%;
+    --destructive: 354 100% 74%;
     --destructive-foreground: 0 0% 100%;
-    --input: 288 14% 27%;
     --sidebar-background: 289 17% 9%;
     --sidebar-foreground: 290 14% 82%;
     --sidebar-primary: 263 100% 76%;
@@ -53,6 +62,20 @@
     --sidebar-border: 288 14% 24%;
     --sidebar-ring: 263 100% 80%;
 
+    /* AA's neutral scale, inverted. The site defines exactly these seven shades
+       as tokens; 300/400/800/950 are literal Tailwind greys handled below. */
+    --neutral-50: 290 18% 12%;
+    --neutral-100: 290 17% 16%;
+    --neutral-200: 288 14% 24%;
+    --neutral-500: 281 9% 59%;
+    --neutral-600: 283 10% 66%;
+    --neutral-700: 284 11% 74%;
+    --neutral-900: 290 22% 96%;
+
+    /* Pale brand tints that only ever serve as surfaces. */
+    --brand-blue-light: 262 15% 15%;
+    --brand-peach: 46 30% 14%;
+
     color: var(--aad-text);
     background: var(--aad-canvas);
     color-scheme: dark;
@@ -60,388 +83,369 @@
     accent-color: var(--aad-purple);
   }
 
-  html[data-aad-theme="dark"] body {
+  html:root body {
     color: var(--aad-text);
     background-color: var(--aad-canvas) !important;
   }
 
-  html[data-aad-theme="dark"] ::selection {
+  /* Tailwind's preflight paints every border #e5e7eb. Color utilities outrank this. */
+  html *,
+  html ::before,
+  html ::after {
+    border-color: var(--aad-border);
+  }
+
+  html:root ::selection {
     color: #fff;
     background: #6842a3;
   }
 
-  /* Neutral surfaces: translate site-owned light utilities into elevation. */
-  html[data-aad-theme="dark"] .bg-background {
-    background-color: var(--aad-canvas) !important;
-  }
-
-  html[data-aad-theme="dark"] .bg-white,
-  html[data-aad-theme="dark"] [class~="bg-white/95"],
-  html[data-aad-theme="dark"] [class~="bg-white/90"],
-  html[data-aad-theme="dark"] [class~="bg-white/80"],
-  html[data-aad-theme="dark"] [class~="bg-white/50"] {
+  /* Literal white/black/grey utilities that bypass the site's tokens. */
+  html:root :is(.bg-white, [class~="bg-white/95"], [class~="bg-white/90"], [class~="bg-white/85"], [class~="bg-white/80"], [class~="bg-white/50"]):not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])),
+  html:root [class~="data-[state=on]:bg-white"][data-state="on"] {
     background-color: var(--aad-surface-1) !important;
   }
 
-  html[data-aad-theme="dark"] .bg-neutral-50,
-  html[data-aad-theme="dark"] .bg-card,
-  html[data-aad-theme="dark"] .bg-popover {
-    background-color: var(--aad-surface-2) !important;
-  }
-
-  html[data-aad-theme="dark"] .bg-neutral-100,
-  html[data-aad-theme="dark"] .bg-neutral-200,
-  html[data-aad-theme="dark"] .bg-muted,
-  html[data-aad-theme="dark"] .bg-accent,
-  html[data-aad-theme="dark"] .bg-secondary {
-    background-color: var(--aad-surface-3) !important;
-  }
-
-  /* Hairline dividers drawn as 1px filled divs. */
-  html[data-aad-theme="dark"] .bg-neutral-300 {
-    background-color: var(--aad-border-strong) !important;
-  }
-
-  html[data-aad-theme="dark"] [class~="bg-neutral-50/50"],
-  html[data-aad-theme="dark"] [class~="bg-neutral-100/50"],
-  html[data-aad-theme="dark"] [class~="bg-neutral-100/70"],
-  html[data-aad-theme="dark"] [class~="bg-neutral-100/80"] {
-    background-color: color-mix(in srgb, var(--aad-surface-3) 75%, transparent) !important;
-  }
-
-  html[data-aad-theme="dark"] [class~="hover:bg-white"]:hover,
-  html[data-aad-theme="dark"] [class~="hover:bg-neutral-50"]:hover,
-  html[data-aad-theme="dark"] [class~="hover:bg-neutral-100"]:hover,
-  html[data-aad-theme="dark"] [class~="hover:bg-neutral-200"]:hover,
-  html[data-aad-theme="dark"] [class~="data-[state=selected]:bg-neutral-100"][data-state="selected"],
-  html[data-aad-theme="dark"] [class~="data-[state=checked]:bg-neutral-100"][data-state="checked"] {
+  html:root [class~="hover:bg-white"]:hover,
+  html:root [class~="hover:bg-white/95"]:hover,
+  html:root .group:hover [class~="group-hover:bg-white"] {
     background-color: var(--aad-surface-hover) !important;
   }
 
-  html[data-aad-theme="dark"] [class~="data-[state=on]:bg-white"][data-state="on"] {
-    background-color: var(--aad-surface-1) !important;
+  html:root .bg-neutral-300,
+  html:root .bg-neutral-400,
+  html:root [class~="data-[state=unchecked]:bg-neutral-300"][data-state="unchecked"] {
+    background-color: var(--aad-border-strong) !important;
   }
 
-  html[data-aad-theme="dark"] [class~="data-[state=on]:bg-brand-blue/5"][data-state="on"] {
-    background-color: #2d2440 !important;
+  html:root :is(.text-black, .text-neutral-950, .text-neutral-800):not(:where([class*="hover:text-"]:hover, .group:hover [class*="group-hover:text-"])),
+  html:root [class~="hover:text-black"]:hover,
+  html:root [class~="hover:text-neutral-800"]:hover,
+  html:root .group:hover [class~="group-hover:text-black"] {
+    color: var(--aad-text) !important;
   }
 
-  /* Tailwind's pale notification families need dark, hue-preserving surfaces. */
-  html[data-aad-theme="dark"] .bg-purple-50,
-  html[data-aad-theme="dark"] .bg-purple-100,
-  html[data-aad-theme="dark"] .bg-violet-50,
-  html[data-aad-theme="dark"] .bg-violet-100,
-  html[data-aad-theme="dark"] .bg-fuchsia-50,
-  html[data-aad-theme="dark"] .bg-fuchsia-100 {
-    background-color: #2d233a !important;
+  /* Light greys are only used as text on the site's dark sections. */
+  html:root :is(.text-neutral-100, .text-neutral-200, .text-neutral-300):not(:where([class*="hover:text-"]:hover, .group:hover [class*="group-hover:text-"])),
+  html:root .group:hover [class~="group-hover:text-neutral-300"] {
+    color: var(--aad-text-muted) !important;
   }
 
-  html[data-aad-theme="dark"] .bg-blue-50,
-  html[data-aad-theme="dark"] .bg-blue-100,
-  html[data-aad-theme="dark"] .bg-sky-50,
-  html[data-aad-theme="dark"] .bg-sky-100,
-  html[data-aad-theme="dark"] .bg-cyan-50,
-  html[data-aad-theme="dark"] .bg-cyan-100 {
-    background-color: #172b39 !important;
+  html:root .text-neutral-400:not(:where([class*="hover:text-"]:hover, .group:hover [class*="group-hover:text-"])) {
+    color: var(--aad-text-subtle) !important;
   }
 
-  html[data-aad-theme="dark"] .bg-indigo-50,
-  html[data-aad-theme="dark"] .bg-indigo-100 {
-    background-color: #1f2140 !important;
+  html:root .border-neutral-300 {
+    border-color: var(--aad-border) !important;
   }
 
-  html[data-aad-theme="dark"] [class~="hover:bg-indigo-100"]:hover {
-    background-color: #292c52 !important;
+  html:root .border-black,
+  html:root [class~="hover:border-black"]:hover {
+    border-color: var(--aad-text-subtle) !important;
   }
 
-  html[data-aad-theme="dark"] .bg-green-50,
-  html[data-aad-theme="dark"] .bg-green-100,
-  html[data-aad-theme="dark"] .bg-emerald-50,
-  html[data-aad-theme="dark"] .bg-emerald-100,
-  html[data-aad-theme="dark"] .bg-teal-50,
-  html[data-aad-theme="dark"] .bg-teal-100,
-  html[data-aad-theme="dark"] .bg-lime-50,
-  html[data-aad-theme="dark"] .bg-lime-100 {
-    background-color: #153129 !important;
+  html:root [class~="hover:border-neutral-300"]:hover,
+  html:root [class~="hover:border-neutral-400"]:hover,
+  html:root .group:hover [class~="group-hover:border-neutral-400"] {
+    border-color: var(--aad-border-strong) !important;
   }
 
-  html[data-aad-theme="dark"] .bg-red-50,
-  html[data-aad-theme="dark"] .bg-red-100,
-  html[data-aad-theme="dark"] .bg-rose-50,
-  html[data-aad-theme="dark"] .bg-rose-100,
-  html[data-aad-theme="dark"] .bg-pink-50,
-  html[data-aad-theme="dark"] .bg-pink-100 {
-    background-color: #3a2028 !important;
+  html:root .fill-neutral-300 {
+    fill: var(--aad-border-strong) !important;
   }
 
-  html[data-aad-theme="dark"] .bg-amber-50,
-  html[data-aad-theme="dark"] .bg-amber-100,
-  html[data-aad-theme="dark"] .bg-yellow-50,
-  html[data-aad-theme="dark"] .bg-yellow-100,
-  html[data-aad-theme="dark"] .bg-orange-50,
-  html[data-aad-theme="dark"] .bg-orange-100 {
-    background-color: #352a18 !important;
+  html:root .stroke-neutral-400 {
+    stroke: var(--aad-text-subtle) !important;
   }
 
-  /* Dark -700/-800 text pairs with those pale backgrounds upstream; lift it to match. */
-  html[data-aad-theme="dark"] .text-green-700,
-  html[data-aad-theme="dark"] .text-green-800,
-  html[data-aad-theme="dark"] .text-emerald-700,
-  html[data-aad-theme="dark"] .text-emerald-800,
-  html[data-aad-theme="dark"] .text-teal-700,
-  html[data-aad-theme="dark"] .text-teal-800 {
-    color: var(--aad-success) !important;
+  /* neutral-900 is now near-white. These use it as an ink fill under white text
+     (docs code blocks, GET badges, invert-on-hover cards), so keep them dark. */
+  html:root .bg-neutral-900:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])),
+  html:root [class~="data-[selected=true]:bg-neutral-900"][data-selected="true"] {
+    background-color: var(--aad-code) !important;
   }
 
-  html[data-aad-theme="dark"] .text-amber-700,
-  html[data-aad-theme="dark"] .text-amber-800,
-  html[data-aad-theme="dark"] .text-yellow-700,
-  html[data-aad-theme="dark"] .text-yellow-800,
-  html[data-aad-theme="dark"] .text-orange-700,
-  html[data-aad-theme="dark"] .text-orange-800 {
-    color: var(--aad-warning) !important;
+  html:root [class~="hover:bg-neutral-900"]:hover,
+  html:root [class~="hover:bg-neutral-700"]:hover,
+  html:root .group:hover [class~="group-hover:bg-neutral-900"] {
+    background-color: var(--aad-surface-hover) !important;
   }
 
-  html[data-aad-theme="dark"] .text-red-700,
-  html[data-aad-theme="dark"] .text-red-800,
-  html[data-aad-theme="dark"] .text-rose-700,
-  html[data-aad-theme="dark"] .text-rose-800 {
-    color: var(--aad-danger) !important;
+  html:root .from-neutral-900 {
+    --tw-gradient-from: var(--aad-code) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(12 10 14 / 0) var(--tw-gradient-to-position) !important;
   }
 
-  html[data-aad-theme="dark"] .text-blue-700,
-  html[data-aad-theme="dark"] .text-blue-800,
-  html[data-aad-theme="dark"] .text-sky-700,
-  html[data-aad-theme="dark"] .text-sky-800 {
-    color: #8ec7ff !important;
-  }
-
-  html[data-aad-theme="dark"] .text-indigo-500,
-  html[data-aad-theme="dark"] .text-indigo-600,
-  html[data-aad-theme="dark"] .text-indigo-700,
-  html[data-aad-theme="dark"] [class~="[&_span]:text-indigo-500"] span {
-    color: #b3bcff !important;
-  }
-
-  html[data-aad-theme="dark"] .text-purple-700,
-  html[data-aad-theme="dark"] .text-purple-800,
-  html[data-aad-theme="dark"] .text-violet-700,
-  html[data-aad-theme="dark"] .text-violet-800 {
-    color: var(--aad-purple-soft) !important;
-  }
-
-  /* Surface-like AA brand tokens are tinted, not desaturated. */
-  html[data-aad-theme="dark"] .bg-brand-blue-light {
-    background-color: #24202b !important;
-  }
-
-  html[data-aad-theme="dark"] .bg-brand-mint {
-    background-color: #123129 !important;
-  }
-
-  html[data-aad-theme="dark"] .bg-brand-peach {
-    background-color: #2d2818 !important;
-  }
-
-  html[data-aad-theme="dark"] .bg-brand-purple-light {
-    background-color: #35264a !important;
-  }
-
-  /* Deliberate accent fills remain vivid. Their text must retain contrast. */
-  html[data-aad-theme="dark"] .bg-brand-lime,
-  html[data-aad-theme="dark"] .bg-brand-yellow,
-  html[data-aad-theme="dark"] .bg-brand-orange,
-  html[data-aad-theme="dark"] .bg-brand-purple,
-  html[data-aad-theme="dark"] .bg-brand-blue,
-  html[data-aad-theme="dark"] .bg-brand-magenta,
-  html[data-aad-theme="dark"] .bg-black,
-  html[data-aad-theme="dark"] .bg-neutral-900 {
-    forced-color-adjust: none;
+  html:root [class~="via-neutral-900/85"] {
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(12 10 14 / 0.85) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
   }
 
   /* Black fills on a near-black canvas need an edge: nav pill, swatches, cards. */
-  html[data-aad-theme="dark"] .bg-black,
-  html[data-aad-theme="dark"] .bg-neutral-900 {
+  html:root .bg-black,
+  html:root .bg-neutral-900 {
     outline: 1px solid var(--aad-border-strong);
     outline-offset: -1px;
   }
 
-  /* Bright brand fills inherit black text upstream; keep it dark here too. */
-  html[data-aad-theme="dark"] .bg-brand-lime:not(.text-white),
-  html[data-aad-theme="dark"] .bg-brand-yellow:not(.text-white) {
-    color: #0b090c;
+  html:root [class~="data-[state=on]:bg-brand-blue/5"][data-state="on"] {
+    background-color: #2d2440 !important;
   }
 
-  /* Tab triggers that force black text when active. */
-  html[data-aad-theme="dark"] [class~="data-[state=active]:!text-black"][data-state="active"],
-  html[data-aad-theme="dark"] [class~="data-[state=active]:text-black"][data-state="active"] {
-    color: var(--aad-text) !important;
+  /* Tailwind's pale notification families need dark, hue-preserving surfaces. */
+  html:root .bg-purple-50,
+  html:root .bg-purple-100,
+  html:root .bg-violet-50,
+  html:root .bg-violet-100,
+  html:root .bg-fuchsia-50,
+  html:root .bg-fuchsia-100 {
+    background-color: #2d233a !important;
   }
 
-  html[data-aad-theme="dark"] .bg-brand-lime .text-black,
-  html[data-aad-theme="dark"] .bg-brand-yellow .text-black,
-  html[data-aad-theme="dark"] .bg-brand-orange .text-black,
-  html[data-aad-theme="dark"] .bg-brand-lime.text-black,
-  html[data-aad-theme="dark"] .bg-brand-yellow.text-black,
-  html[data-aad-theme="dark"] .bg-brand-orange.text-black,
-  html[data-aad-theme="dark"] .bg-brand-lime .text-neutral-900,
-  html[data-aad-theme="dark"] .bg-brand-yellow .text-neutral-900,
-  html[data-aad-theme="dark"] .bg-brand-orange .text-neutral-900,
-  html[data-aad-theme="dark"] .bg-brand-lime.text-neutral-900,
-  html[data-aad-theme="dark"] .bg-brand-yellow.text-neutral-900,
-  html[data-aad-theme="dark"] .bg-brand-orange.text-neutral-900 {
-    color: #0b090c !important;
+  html:root .bg-blue-50,
+  html:root .bg-blue-100,
+  html:root .bg-sky-50,
+  html:root .bg-sky-100,
+  html:root .bg-cyan-50,
+  html:root .bg-cyan-100,
+  html:root [class~="hover:bg-sky-100"]:hover {
+    background-color: #172b39 !important;
   }
 
-  html[data-aad-theme="dark"] .bg-brand-mint .text-black,
-  html[data-aad-theme="dark"] .bg-brand-mint.text-black,
-  html[data-aad-theme="dark"] .bg-brand-mint .text-neutral-900,
-  html[data-aad-theme="dark"] .bg-brand-mint.text-neutral-900 {
-    color: var(--aad-text) !important;
+  html:root .bg-indigo-50,
+  html:root .bg-indigo-100 {
+    background-color: #1f2140 !important;
   }
 
-  /* Typography: remap neutral roles while retaining semantic color accents. */
-  html[data-aad-theme="dark"] .text-black,
-  html[data-aad-theme="dark"] .text-neutral-900,
-  html[data-aad-theme="dark"] .text-neutral-800,
-  html[data-aad-theme="dark"] .text-foreground,
-  html[data-aad-theme="dark"] .text-card-foreground,
-  html[data-aad-theme="dark"] .text-popover-foreground {
-    color: var(--aad-text) !important;
+  html:root [class~="hover:bg-indigo-100"]:hover {
+    background-color: #292c52 !important;
   }
 
-  html[data-aad-theme="dark"] .text-neutral-700,
-  html[data-aad-theme="dark"] .text-neutral-600,
-  html[data-aad-theme="dark"] .text-muted-foreground,
-  html[data-aad-theme="dark"] .text-secondary-foreground {
-    color: var(--aad-text-muted) !important;
+  html:root .bg-green-50,
+  html:root .bg-green-100,
+  html:root .bg-emerald-50,
+  html:root .bg-emerald-100,
+  html:root .bg-teal-50,
+  html:root .bg-teal-100,
+  html:root .bg-lime-50,
+  html:root .bg-lime-100 {
+    background-color: #153129 !important;
   }
 
-  html[data-aad-theme="dark"] .text-neutral-500,
-  html[data-aad-theme="dark"] .text-neutral-400,
-  html[data-aad-theme="dark"] .text-neutral-300 {
-    color: var(--aad-text-subtle) !important;
+  html:root .bg-red-50,
+  html:root .bg-red-100,
+  html:root .bg-rose-50,
+  html:root .bg-rose-100,
+  html:root .bg-pink-50,
+  html:root .bg-pink-100 {
+    background-color: #3a2028 !important;
   }
 
-  html[data-aad-theme="dark"] .text-brand-plum,
-  html[data-aad-theme="dark"] [class~="text-brand-plum/60"],
-  html[data-aad-theme="dark"] .text-brand-purple-dark,
-  html[data-aad-theme="dark"] .text-brand-purple {
-    color: var(--aad-purple-soft) !important;
+  html:root .bg-amber-50,
+  html:root .bg-amber-100,
+  html:root .bg-yellow-50,
+  html:root .bg-yellow-100,
+  html:root .bg-orange-50,
+  html:root .bg-orange-100 {
+    background-color: #352a18 !important;
   }
 
-  html[data-aad-theme="dark"] .text-red-500,
-  html[data-aad-theme="dark"] .text-red-600,
-  html[data-aad-theme="dark"] .text-destructive {
-    color: var(--aad-danger) !important;
-  }
-
-  html[data-aad-theme="dark"] .text-green-500,
-  html[data-aad-theme="dark"] .text-green-600 {
+  /* Mid and dark colored text pairs with those pale backgrounds upstream; lift it. */
+  html:root .text-green-500,
+  html:root .text-green-600,
+  html:root .text-green-700,
+  html:root .text-green-800,
+  html:root .text-emerald-600,
+  html:root .text-emerald-700,
+  html:root .text-emerald-800,
+  html:root .text-teal-600,
+  html:root .text-teal-700,
+  html:root .text-teal-800 {
     color: var(--aad-success) !important;
   }
 
-  html[data-aad-theme="dark"] .text-amber-500,
-  html[data-aad-theme="dark"] .text-yellow-500 {
+  html:root .text-lime-600 {
+    color: #c8f083 !important;
+  }
+
+  html:root .text-amber-500,
+  html:root .text-amber-600,
+  html:root .text-amber-700,
+  html:root .text-amber-800,
+  html:root .text-yellow-500,
+  html:root .text-yellow-600,
+  html:root .text-yellow-700,
+  html:root .text-yellow-800,
+  html:root .text-orange-600,
+  html:root .text-orange-700,
+  html:root .text-orange-800,
+  html:root [class~="hover:text-amber-800"]:hover {
     color: var(--aad-warning) !important;
   }
 
-  /* Borders, separators, rings, and shadows. */
-  html[data-aad-theme="dark"] .border,
-  html[data-aad-theme="dark"] .border-b,
-  html[data-aad-theme="dark"] .border-t,
-  html[data-aad-theme="dark"] .border-l,
-  html[data-aad-theme="dark"] .border-r,
-  html[data-aad-theme="dark"] .border-neutral-100,
-  html[data-aad-theme="dark"] .border-neutral-200,
-  html[data-aad-theme="dark"] .border-neutral-300,
-  html[data-aad-theme="dark"] .border-input,
-  html[data-aad-theme="dark"] .border-border,
-  html[data-aad-theme="dark"] .divide-neutral-100 > :not([hidden]) ~ :not([hidden]),
-  html[data-aad-theme="dark"] .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
-    border-color: var(--aad-border) !important;
+  html:root .text-red-500,
+  html:root .text-red-600,
+  html:root .text-red-700,
+  html:root .text-red-800,
+  html:root .text-rose-700,
+  html:root .text-rose-800 {
+    color: var(--aad-danger) !important;
   }
 
-  html[data-aad-theme="dark"] .border-brand-blue-light {
-    border-color: #4b4055 !important;
+  html:root .text-blue-500,
+  html:root .text-blue-600,
+  html:root .text-blue-700,
+  html:root .text-blue-800,
+  html:root .text-sky-600,
+  html:root .text-sky-700,
+  html:root .text-sky-800,
+  html:root [class~="hover:text-blue-700"]:hover {
+    color: var(--aad-info) !important;
   }
 
-  html[data-aad-theme="dark"] [class*="shadow"],
-  html[data-aad-theme="dark"] [data-radix-popper-content-wrapper] {
-    --tw-shadow-color: rgb(0 0 0 / 0.45);
+  html:root .text-indigo-500,
+  html:root .text-indigo-600,
+  html:root .text-indigo-700,
+  html:root [class~="[&_span]:text-indigo-500"] span {
+    color: #b3bcff !important;
   }
 
-  html[data-aad-theme="dark"] :focus-visible {
+  html:root .text-purple-700,
+  html:root .text-purple-800,
+  html:root .text-violet-700,
+  html:root .text-violet-800,
+  html:root .text-brand-plum,
+  html:root [class~="text-brand-plum/60"],
+  html:root .text-brand-purple-dark,
+  html:root .text-brand-purple,
+  html:root .text-brand-purple-light,
+  html:root [class~="hover:text-brand-purple"]:hover,
+  html:root [class~="hover:text-brand-plum"]:hover,
+  html:root [class~="[&_a:hover]:text-brand-purple"] a:hover {
+    color: var(--aad-purple-soft) !important;
+  }
+
+  /* Pale brand fills that also serve as text or borders elsewhere stay utility-level. */
+  html:root .bg-brand-mint {
+    background-color: #123129 !important;
+  }
+
+  html:root .bg-brand-purple-light {
+    background-color: #35264a !important;
+  }
+
+  /* Deliberate accent fills remain vivid. Their text must retain contrast. */
+  html:root .bg-brand-lime,
+  html:root .bg-brand-yellow,
+  html:root .bg-brand-orange,
+  html:root .bg-brand-purple,
+  html:root .bg-brand-blue,
+  html:root .bg-brand-magenta,
+  html:root .bg-black,
+  html:root .bg-neutral-900 {
+    forced-color-adjust: none;
+  }
+
+  /* Bright brand fills inherit black text upstream; keep it dark here too. */
+  html:root .bg-brand-lime:not(.text-white),
+  html:root .bg-brand-yellow:not(.text-white) {
+    color: #0b090c;
+  }
+
+  html:root .bg-brand-lime .text-black,
+  html:root .bg-brand-yellow .text-black,
+  html:root .bg-brand-orange .text-black,
+  html:root .bg-brand-lime.text-black,
+  html:root .bg-brand-yellow.text-black,
+  html:root .bg-brand-orange.text-black,
+  html:root .bg-brand-lime .text-neutral-900,
+  html:root .bg-brand-yellow .text-neutral-900,
+  html:root .bg-brand-orange .text-neutral-900,
+  html:root .bg-brand-lime.text-neutral-900,
+  html:root .bg-brand-yellow.text-neutral-900,
+  html:root .bg-brand-orange.text-neutral-900 {
+    color: #0b090c !important;
+  }
+
+  html:root .bg-brand-mint .text-black,
+  html:root .bg-brand-mint.text-black,
+  html:root .bg-brand-mint .text-neutral-900,
+  html:root .bg-brand-mint.text-neutral-900 {
+    color: var(--aad-text) !important;
+  }
+
+  /* Tab triggers that force black text when active. */
+  html:root [class~="data-[state=active]:!text-black"][data-state="active"],
+  html:root [class~="data-[state=active]:text-black"][data-state="active"] {
+    color: var(--aad-text) !important;
+  }
+
+  /* Focus. */
+  html:root :focus-visible {
     outline-color: var(--aad-focus);
   }
 
-  html[data-aad-theme="dark"] [class*="focus-visible:ring"]:focus-visible {
+  html:root [class*="focus-visible:ring"]:focus-visible {
     --tw-ring-color: var(--aad-focus) !important;
     --tw-ring-offset-color: var(--aad-canvas) !important;
   }
 
-  /* Form controls and interactive primitives. */
-  html[data-aad-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
-  html[data-aad-theme="dark"] textarea,
-  html[data-aad-theme="dark"] select {
+  /* Form controls. */
+  html:root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+  html:root textarea,
+  html:root select {
     color: var(--aad-text) !important;
     background-color: var(--aad-surface-2) !important;
     border-color: var(--aad-border) !important;
     caret-color: var(--aad-purple-soft);
   }
 
-  html[data-aad-theme="dark"] input::placeholder,
-  html[data-aad-theme="dark"] textarea::placeholder {
+  html:root input::placeholder,
+  html:root textarea::placeholder {
     color: var(--aad-text-subtle) !important;
     opacity: 1;
   }
 
-  html[data-aad-theme="dark"] input[type="checkbox"],
-  html[data-aad-theme="dark"] input[type="radio"] {
+  html:root input[type="checkbox"],
+  html:root input[type="radio"] {
     color: var(--aad-purple);
     background-color: var(--aad-surface-2);
     border-color: var(--aad-border-strong);
   }
 
-  html[data-aad-theme="dark"] option {
+  html:root option {
     color: var(--aad-text);
     background: var(--aad-surface-2);
   }
 
-  html[data-aad-theme="dark"] button:disabled,
-  html[data-aad-theme="dark"] [aria-disabled="true"] {
-    color: var(--aad-text-subtle);
-  }
-
   /* Menus, dialogs, drawers, tooltips, and portal content. */
-  html[data-aad-theme="dark"] [role="dialog"],
-  html[data-aad-theme="dark"] [role="menu"],
-  html[data-aad-theme="dark"] [role="listbox"],
-  html[data-aad-theme="dark"] [data-radix-menu-content],
-  html[data-aad-theme="dark"] [data-radix-select-content],
-  html[data-aad-theme="dark"] [data-radix-popper-content-wrapper] > div:not([class*="bg-black"]) {
+  html:root [role="dialog"],
+  html:root [role="menu"],
+  html:root [role="listbox"],
+  html:root [data-radix-menu-content],
+  html:root [data-radix-select-content],
+  html:root [data-radix-popper-content-wrapper] > div:not([class*="bg-black"]) {
     color: var(--aad-text);
     background-color: var(--aad-surface-2) !important;
     border-color: var(--aad-border) !important;
   }
 
-  html[data-aad-theme="dark"] [data-radix-dialog-overlay],
-  html[data-aad-theme="dark"] [data-radix-alert-dialog-overlay],
-  html[data-aad-theme="dark"] [class~="bg-black/50"],
-  html[data-aad-theme="dark"] [class~="bg-black/80"] {
+  html:root [data-radix-dialog-overlay],
+  html:root [data-radix-alert-dialog-overlay],
+  html:root [class~="bg-black/50"],
+  html:root [class~="bg-black/80"] {
     background-color: rgb(4 3 5 / 0.78) !important;
     backdrop-filter: blur(3px);
   }
 
-  html[data-aad-theme="dark"] [role="option"][data-highlighted],
-  html[data-aad-theme="dark"] [role="menuitem"][data-highlighted],
-  html[data-aad-theme="dark"] [cmdk-item][data-selected="true"] {
+  html:root [role="option"][data-highlighted],
+  html:root [role="menuitem"][data-highlighted],
+  html:root [cmdk-item][data-selected="true"] {
     color: var(--aad-text);
     background-color: var(--aad-surface-hover) !important;
   }
 
-  html[data-aad-theme="dark"] [data-radix-tooltip-content],
-  html[data-aad-theme="dark"] [role="tooltip"] {
+  html:root [data-radix-tooltip-content],
+  html:root [role="tooltip"] {
     color: var(--aad-text) !important;
     background-color: #302636 !important;
     border: 1px solid var(--aad-border-strong) !important;
@@ -449,64 +453,43 @@
   }
 
   /* Tables and dense analysis layouts. */
-  html[data-aad-theme="dark"] table {
-    --tw-border-opacity: 1;
-    border-color: var(--aad-border);
-  }
-
-  html[data-aad-theme="dark"] thead,
-  html[data-aad-theme="dark"] [role="rowheader"] {
+  html:root thead,
+  html:root [role="rowheader"] {
     color: var(--aad-text-muted);
   }
 
-  html[data-aad-theme="dark"] tbody tr:hover td,
-  html[data-aad-theme="dark"] tbody tr:hover th {
+  html:root tbody tr:hover td,
+  html:root tbody tr:hover th {
     background-color: color-mix(in srgb, var(--aad-surface-hover) 68%, transparent);
   }
 
-  html[data-aad-theme="dark"] [class~="sticky"].bg-white,
-  html[data-aad-theme="dark"] [class~="sticky"].bg-background,
-  html[data-aad-theme="dark"] td[class~="bg-white"],
-  html[data-aad-theme="dark"] th[class~="bg-white"] {
-    background-color: var(--aad-surface-1) !important;
-  }
-
-  html[data-aad-theme="dark"] .from-white {
+  html:root .from-white {
     --tw-gradient-from: var(--aad-surface-1) var(--tw-gradient-from-position) !important;
     --tw-gradient-to: rgb(24 19 27 / 0) var(--tw-gradient-to-position) !important;
   }
 
-  html[data-aad-theme="dark"] .to-white {
+  html:root .to-white {
     --tw-gradient-to: var(--aad-surface-1) var(--tw-gradient-to-position) !important;
   }
 
-  html[data-aad-theme="dark"] .from-background {
-    --tw-gradient-from: var(--aad-canvas) var(--tw-gradient-from-position) !important;
-    --tw-gradient-to: rgb(16 13 18 / 0) var(--tw-gradient-to-position) !important;
-  }
-
-  html[data-aad-theme="dark"] .to-background {
-    --tw-gradient-to: var(--aad-canvas) var(--tw-gradient-to-position) !important;
-  }
-
   /* Recharts: neutral scaffolding changes; categorical data marks do not. */
-  html[data-aad-theme="dark"] .recharts-cartesian-grid line,
-  html[data-aad-theme="dark"] .recharts-cartesian-grid-horizontal line,
-  html[data-aad-theme="dark"] .recharts-cartesian-grid-vertical line {
+  html:root .recharts-cartesian-grid line,
+  html:root .recharts-cartesian-grid-horizontal line,
+  html:root .recharts-cartesian-grid-vertical line {
     stroke: var(--aad-border) !important;
     stroke-opacity: 0.82;
   }
 
-  html[data-aad-theme="dark"] .recharts-cartesian-axis-line,
-  html[data-aad-theme="dark"] .recharts-cartesian-axis-tick-line,
-  html[data-aad-theme="dark"] .recharts-reference-line line {
+  html:root .recharts-cartesian-axis-line,
+  html:root .recharts-cartesian-axis-tick-line,
+  html:root .recharts-reference-line line {
     stroke: var(--aad-border-strong) !important;
   }
 
-  html[data-aad-theme="dark"] .recharts-cartesian-axis-tick text,
-  html[data-aad-theme="dark"] .recharts-label,
-  html[data-aad-theme="dark"] .recharts-text,
-  html[data-aad-theme="dark"] .recharts-legend-item-text {
+  html:root .recharts-cartesian-axis-tick text,
+  html:root .recharts-label,
+  html:root .recharts-text,
+  html:root .recharts-legend-item-text {
     fill: var(--aad-text-muted) !important;
     color: var(--aad-text-muted) !important;
   }
@@ -514,37 +497,37 @@
   /* AA renders values beside bars as unclassed SVG text: hard-coded black, or
      no fill at all (SVG's default is black). Readable in-bar labels upstream
      are white; the only black in-bar text is a 25%-opacity shadow copy. */
-  html[data-aad-theme="dark"] .recharts-surface text[fill="black"],
-  html[data-aad-theme="dark"] .recharts-surface text[fill="#000"],
-  html[data-aad-theme="dark"] .recharts-surface text[fill="#000000"],
-  html[data-aad-theme="dark"] .recharts-label-list:not([fill]) text:not([fill]) {
+  html:root .recharts-surface text[fill="black"],
+  html:root .recharts-surface text[fill="#000"],
+  html:root .recharts-surface text[fill="#000000"],
+  html:root .recharts-label-list:not([fill]) text:not([fill]) {
     fill: var(--aad-text-muted) !important;
   }
 
   /* Scatter point names: dark text with a white halo. Invert the halo, not the data. */
-  html[data-aad-theme="dark"] .recharts-surface text[stroke="white"][paint-order="stroke"] {
+  html:root .recharts-surface text[stroke="white"][paint-order="stroke"] {
     fill: var(--aad-text) !important;
     stroke: var(--aad-canvas) !important;
   }
 
   /* Black data series (e.g. "Proprietary") keep their fill but gain an edge. */
-  html[data-aad-theme="dark"] .recharts-surface path[fill="#000"],
-  html[data-aad-theme="dark"] .recharts-surface path[fill="black"],
-  html[data-aad-theme="dark"] .recharts-surface path[fill="#000000"],
-  html[data-aad-theme="dark"] .recharts-surface rect[fill="#000"],
-  html[data-aad-theme="dark"] .recharts-surface rect[fill="black"],
-  html[data-aad-theme="dark"] .recharts-surface rect[fill="#000000"] {
+  html:root .recharts-surface path[fill="#000"],
+  html:root .recharts-surface path[fill="black"],
+  html:root .recharts-surface path[fill="#000000"],
+  html:root .recharts-surface rect[fill="#000"],
+  html:root .recharts-surface rect[fill="black"],
+  html:root .recharts-surface rect[fill="#000000"] {
     stroke: var(--aad-border-strong);
     stroke-width: 1;
   }
 
   /* Chart watermark: black wordmark paths beside the purple mark. */
-  html[data-aad-theme="dark"] svg[viewBox="0 0 402 44"] path[fill="#000"] {
+  html:root svg[viewBox="0 0 402 44"] path[fill="#000"] {
     fill: var(--aad-text-subtle);
   }
 
-  html[data-aad-theme="dark"] .recharts-default-tooltip,
-  html[data-aad-theme="dark"] .recharts-tooltip-wrapper > div {
+  html:root .recharts-default-tooltip,
+  html:root .recharts-tooltip-wrapper > div {
     color: var(--aad-text) !important;
     background: var(--aad-surface-2) !important;
     border-color: var(--aad-border-strong) !important;
@@ -552,24 +535,24 @@
     box-shadow: 0 12px 34px rgb(0 0 0 / 0.48);
   }
 
-  html[data-aad-theme="dark"] .recharts-tooltip-label,
-  html[data-aad-theme="dark"] .recharts-tooltip-item {
+  html:root .recharts-tooltip-label,
+  html:root .recharts-tooltip-item {
     color: var(--aad-text-muted) !important;
   }
 
-  html[data-aad-theme="dark"] .recharts-brush rect:first-child {
+  html:root .recharts-brush rect:first-child {
     fill: var(--aad-surface-2) !important;
     stroke: var(--aad-border) !important;
   }
 
-  html[data-aad-theme="dark"] .recharts-brush-slide {
+  html:root .recharts-brush-slide {
     fill: #6d4a8b !important;
     fill-opacity: 0.42 !important;
   }
 
   /* Documentation, prose, and code samples. */
-  html[data-aad-theme="dark"] .prose,
-  html[data-aad-theme="dark"] [class*="prose-neutral"] {
+  html:root .prose,
+  html:root [class*="prose-neutral"] {
     --tw-prose-body: var(--aad-text-muted);
     --tw-prose-headings: var(--aad-text);
     --tw-prose-lead: var(--aad-text-muted);
@@ -589,96 +572,110 @@
     color: var(--aad-text-muted) !important;
   }
 
-  html[data-aad-theme="dark"] pre,
-  html[data-aad-theme="dark"] code[class*="language-"],
-  html[data-aad-theme="dark"] pre[class*="language-"],
-  html[data-aad-theme="dark"] [data-aad-page="docs"] [class*="bg-neutral-900"] {
+  html:root pre,
+  html:root code[class*="language-"],
+  html:root pre[class*="language-"] {
     color: #eee7f1;
     background-color: var(--aad-code) !important;
     border-color: var(--aad-border) !important;
   }
 
-  html[data-aad-theme="dark"] :not(pre) > code {
+  html:root :not(pre) > code {
     color: #e7d5ff;
     background: #2a2030;
     border-color: var(--aad-border);
   }
 
-  html[data-aad-theme="dark"] blockquote {
+  html:root blockquote {
     color: var(--aad-text-muted);
     border-color: var(--aad-border-strong);
   }
 
-  html[data-aad-theme="dark"] .katex,
-  html[data-aad-theme="dark"] .katex-display {
+  html:root .katex,
+  html:root .katex-display {
+    color: var(--aad-text);
+  }
+
+  /* The Search Index launch article embeds a self-styled flowchart with its own grey scale. */
+  html:root .saw {
+    --n50: var(--aad-surface-2);
+    --n100: var(--aad-surface-3);
+    --n200: var(--aad-border);
+    --n300: var(--aad-border-strong);
+    --n400: var(--aad-text-subtle);
+    --n500: var(--aad-text-subtle);
+    --n600: var(--aad-text-muted);
+    --n700: var(--aad-text-muted);
+    --n800: var(--aad-text);
+    --n900: var(--aad-text);
+  }
+
+  html:root .saw :is(.card, .node, .task-card, button, #stirrupTag) {
+    background: var(--aad-surface-1);
+    color: inherit;
+  }
+
+  /* Its play/pause button is an n900 fill under a white icon. */
+  html:root .saw #controls #btnPlay {
+    background: var(--aad-surface-3);
     color: var(--aad-text);
   }
 
   /* Media is intentionally untouched; only its surrounding presentation changes. */
-  html[data-aad-theme="dark"] article img,
-  html[data-aad-theme="dark"] main picture,
-  html[data-aad-theme="dark"] main video,
-  html[data-aad-theme="dark"] main canvas {
+  html:root article img,
+  html:root main picture,
+  html:root main video,
+  html:root main canvas {
     filter: none !important;
   }
 
-  html[data-aad-theme="dark"] article img,
-  html[data-aad-theme="dark"] main video {
+  html:root article img,
+  html:root main video {
     border-color: var(--aad-border) !important;
     box-shadow: 0 12px 34px rgb(0 0 0 / 0.3);
   }
 
-  html[data-aad-theme="dark"] img[src*="/img/logos/"] {
+  html:root img[src*="/img/logos/"] {
     filter: none !important;
     background-color: rgb(255 255 255 / 0.92);
     border-radius: 0.22rem;
     box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
   }
 
-  html[data-aad-theme="dark"] img[src*="/img/logos/"][class*="w-full"],
-  html[data-aad-theme="dark"] img[src*="/img/logos/"][data-nimg="fill"] {
+  html:root img[src*="/img/logos/"][class*="w-full"],
+  html:root img[src*="/img/logos/"][data-nimg="fill"] {
     padding: 0.35rem;
   }
 
   /* Audio/video browser controls should use the native dark color scheme. */
-  html[data-aad-theme="dark"] audio,
-  html[data-aad-theme="dark"] video {
+  html:root audio,
+  html:root video {
     color-scheme: dark;
   }
 
-  /* Status and loading affordances. */
-  html[data-aad-theme="dark"] .animate-pulse,
-  html[data-aad-theme="dark"] [data-loading="true"] {
-    --tw-bg-opacity: 1;
-  }
-
-  html[data-aad-theme="dark"] progress {
+  html:root progress {
     color: var(--aad-purple);
     background-color: var(--aad-surface-3);
   }
 
-  html[data-aad-theme="dark"] hr {
-    border-color: var(--aad-border);
-  }
-
   /* Scrollbars appear only when useful, matching AA's subtle treatment. */
-  html[data-aad-theme="dark"] ::-webkit-scrollbar {
+  html:root ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
-  html[data-aad-theme="dark"] ::-webkit-scrollbar-track {
+  html:root ::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  html[data-aad-theme="dark"] ::-webkit-scrollbar-thumb {
+  html:root ::-webkit-scrollbar-thumb {
     background: #514256;
     background-clip: content-box;
     border: 2px solid transparent;
     border-radius: 999px;
   }
 
-  html[data-aad-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  html:root ::-webkit-scrollbar-thumb:hover {
     background-color: #6b5772;
     background-clip: content-box;
   }
@@ -686,12 +683,12 @@
 
 /* Printing should remain economical and match the site's original light output. */
 @media print {
-  html[data-aad-theme="dark"] {
+  html:root {
     color-scheme: light !important;
     background: white !important;
   }
 
-  html[data-aad-theme="dark"] body {
+  html:root body {
     color: black !important;
     background: white !important;
   }
@@ -699,8 +696,8 @@
 
 /* Respect Windows high-contrast and other forced-color environments. */
 @media (forced-colors: active) {
-  html[data-aad-theme="dark"],
-  html[data-aad-theme="dark"] body {
+  html:root,
+  html:root body {
     color: CanvasText !important;
     background: Canvas !important;
     forced-color-adjust: auto;

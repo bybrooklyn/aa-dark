@@ -36,13 +36,13 @@ Highlights:
 
 The extension is always on for Artificial Analysis and has no settings panel. Disable it in your browser's extension manager to return to the original appearance.
 
-Privacy: no analytics, tracking, storage, remote code, or data transmission. The extension runs only on `artificialanalysis.ai` and changes presentation locally.
+Privacy: no JavaScript, analytics, tracking, storage, remote code, or data transmission. The extension is two CSS files that run only on `artificialanalysis.ai` and change presentation locally.
 
 This is an independent project and is not affiliated with, endorsed by, or sponsored by Artificial Analysis.
 
 ## Permission justification
 
-`https://artificialanalysis.ai/*`: required solely to inject the local theme stylesheet and route-family marker on the website the extension is designed to theme. No page data is collected, persisted, or transmitted.
+`https://artificialanalysis.ai/*`: required solely to inject the local theme stylesheets on the website the extension is designed to theme. The extension contains no scripts; no page data is read, collected, persisted, or transmitted.
 
 ## Remote code declaration
 
@@ -63,4 +63,4 @@ No user data is collected or used.
 - Host `PRIVACY.md` at a public HTTPS URL.
 - Provide a public support URL or support email.
 - Confirm current Chrome Web Store policy fields in the publisher dashboard.
-- Upload the ZIP from `releases/` only after `npm run validate` passes.
+- Upload the ZIP from `releases/` only after `bun run validate` passes.

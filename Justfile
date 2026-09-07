@@ -16,11 +16,7 @@ build:
 test:
     bun run test
 
-# Verify every route in Artificial Analysis' public sitemaps is classified.
-audit:
-    bun run audit:live
-
-# Run the complete unit, live-site, Chromium, asset, and package gate.
+# Run the complete unit, live-site Chromium, asset, and package gate.
 validate:
     bun run validate
 
@@ -66,7 +62,7 @@ ready:
     node scripts/ready.mjs
 
 # Release X.Y.Z: bump, gate, commit, tag, Chrome Web Store upload + publish, push, GitHub Release.
-# Options after the version: `fast` skips the live-site checks; `--force` skips the clean-tree check.
+# Options after the version: `fast` skips the live-site browser suite; `--force` skips the clean-tree check.
 publish version *options:
     #!/usr/bin/env zsh
     set -euo pipefail

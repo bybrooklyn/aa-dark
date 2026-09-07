@@ -1,7 +1,6 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { build } from "esbuild";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const srcDir = path.join(projectRoot, "src");
@@ -12,22 +11,14 @@ if (manifest.manifest_version !== 3) throw new Error("Only Manifest V3 is suppor
 if (manifest.permissions || manifest.host_permissions || manifest.background || manifest.action) {
   throw new Error("Manifest gained a permission, background worker, or action UI; review the single-purpose privacy model.");
 }
+if (manifest.content_scripts.some((script) => script.js)) {
+  throw new Error("Manifest gained a content script; the extension is CSS-only. Review the privacy policy and store listing.");
+}
 
 await rm(distDir, { recursive: true, force: true });
 await mkdir(path.join(distDir, "icons"), { recursive: true });
 
 await import("./generate-assets.mjs");
-
-await build({
-  entryPoints: [path.join(srcDir, "content.mjs")],
-  outfile: path.join(distDir, "content.js"),
-  bundle: true,
-  format: "iife",
-  platform: "browser",
-  target: ["chrome109"],
-  minify: false,
-  legalComments: "inline",
-});
 
 for (const file of ["manifest.json", "preflight.css", "theme.css"]) {
   await cp(path.join(srcDir, file), path.join(distDir, file));
