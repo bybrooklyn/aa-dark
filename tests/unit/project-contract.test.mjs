@@ -62,22 +62,14 @@ test("theme themes chart scaffolding and leaves data series and media alone", ()
 });
 
 test("declared palette meets the planned contrast floor", () => {
-  const colors = {
-    canvas: "#100d12",
-    surface3: "#2b2230",
-    text: "#f5f1f6",
-    muted: "#c0b5c4",
-    neutral600: "#aca0b1",
-    subtle: "#9a8da0",
-    purple: "#ae82ff",
-    info: "#8ec7ff",
-    success: "#8fe3c5",
-    warning: "#ffc56e",
-    danger: "#ff7c88",
-  };
-  for (const [name, hex] of Object.entries(colors)) {
-    if (name === "canvas" || name === "surface3") continue;
-    assert.ok(contrast(hex, colors.surface3) >= 4.5, `${name} on surface-3`);
+  const colors = Object.fromEntries(
+    [...theme.matchAll(/^    --aad-([\w-]+): (#[0-9a-f]{6});$/gm)].map(([, name, value]) => [name, value]),
+  );
+  for (const token of ["canvas", "surface-3", "text", "text-muted", "text-subtle", "purple", "info", "success", "warning", "danger"]) {
+    assert.ok(colors[token], `${token} must be read from the theme`);
+  }
+  for (const name of ["text", "text-muted", "text-subtle", "purple", "purple-soft", "focus", "info", "success", "warning", "danger"]) {
+    assert.ok(contrast(colors[name], colors["surface-3"]) >= 4.5, `${name} on surface-3`);
   }
 });
 

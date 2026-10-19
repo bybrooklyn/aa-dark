@@ -2,7 +2,7 @@ set shell := ["zsh", "-cu"]
 set dotenv-load := true
 
 # Build the Chrome Web Store upload artifact.
-default: webstore
+default: install
 
 # Install exactly the locked development dependencies.
 install:

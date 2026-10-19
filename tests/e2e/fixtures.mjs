@@ -6,7 +6,7 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const extensionPath = path.join(projectRoot, "dist");
 
 export const test = base.extend({
-  extensionContext: [async ({}, use) => {
+  extensionContext: [async ({}, use, workerInfo) => {
     const context = await chromium.launchPersistentContext("", {
       channel: "chromium",
       headless: true,
@@ -17,6 +17,8 @@ export const test = base.extend({
       viewport: { width: 1280, height: 800 },
       colorScheme: "light",
     });
+    context.setDefaultTimeout(workerInfo.project.use.actionTimeout);
+    context.setDefaultNavigationTimeout(workerInfo.project.use.navigationTimeout);
     await use(context);
     await context.close();
   }, { scope: "worker" }],

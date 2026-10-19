@@ -9,6 +9,8 @@ export default defineConfig({
   retries: 1,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
+    actionTimeout: 15_000,
+    navigationTimeout: 60_000,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",

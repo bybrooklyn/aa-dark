@@ -9,6 +9,7 @@
     "assets": "node scripts/generate-assets.mjs",
     "build": "node scripts/build.mjs",
     "test": "node --test tests/unit/*.test.mjs",
+    "test:components": "bun run build && playwright test tests/e2e/components.spec.mjs",
     "test:e2e": "bun run build && playwright test",
     "package": "bun run build && node scripts/package.mjs",
     "validate": "bun run test && bun run test:e2e && bun run package"

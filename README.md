@@ -26,7 +26,8 @@ The theme is intentionally always on. Disable the extension from the browser's e
 
 ```sh
 bun run test           # manifest, theme, and contrast contracts
-bun run test:e2e       # load the real extension in bundled Chromium against the live site
+bun run test:components # deterministic browser checks without the live site
+bun run test:e2e       # component fixtures, official-site checks, and screenshots
 bun run package        # produce the Chrome Web Store upload ZIP
 bun run validate       # run the complete release gate
 ```
@@ -37,7 +38,11 @@ Playwright's bundled Chromium must be installed once:
 bunx playwright install chromium
 ```
 
-The browser suite uses the live site. A failure can mean either a regression in this extension or deliberate upstream markup changes; investigate rather than updating selectors or allowlists blindly.
+The component suite loads the real extension against intercepted fixture documents at its permitted origin; it needs no live-site responses. It covers opacity, focus, selection, row colors, tooltips, print, and forced colors.
+
+The full browser suite also uses the official live site. Each representative route has independent surface and contrast checks, and interaction tests open navigation, search, table filters, chart controls, and arena dialogs. Chart fills and media are compared with a browser without the extension. Page readiness uses rendered content rather than a fixed delay. A failure can mean either an extension regression or deliberate upstream markup changes; investigate rather than updating selectors or allowlists blindly.
+
+Interaction and narrow-layout screenshots are saved under `test-results/`; the five store screenshots are refreshed under `store-assets/screenshots/`. Review them before publishing. See [the polish validation record](docs/polish-validation.md) for the latest run and its coverage limits.
 
 ## Chrome Web Store package
 

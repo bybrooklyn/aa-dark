@@ -14,7 +14,7 @@
  * own hover colors keep working.
  */
 
-@media screen {
+@media screen and (forced-colors: none) {
   html:root {
     --aad-canvas: #100d12;
     --aad-surface-1: #18131b;
@@ -72,7 +72,7 @@
     --neutral-700: 284 11% 74%;
     --neutral-900: 290 22% 96%;
 
-    /* Pale brand tints that only ever serve as surfaces. */
+    /* Pale brand tints that serve as surfaces (text uses are restored below). */
     --brand-blue-light: 262 15% 15%;
     --brand-peach: 46 30% 14%;
 
@@ -101,15 +101,39 @@
   }
 
   /* Literal white/black/grey utilities that bypass the site's tokens. */
-  html:root :is(.bg-white, [class~="bg-white/95"], [class~="bg-white/90"], [class~="bg-white/85"], [class~="bg-white/80"], [class~="bg-white/50"]):not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])),
+  html:root .bg-white:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])),
   html:root [class~="data-[state=on]:bg-white"][data-state="on"] {
     background-color: var(--aad-surface-1) !important;
   }
 
+  /* Preserve the opacity of translucent white surfaces without affecting children. */
+  html:root [class~="bg-white/95"]:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])) {
+    background-color: color-mix(in srgb, var(--aad-surface-1) 95%, transparent) !important;
+  }
+
+  html:root [class~="bg-white/90"]:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])) {
+    background-color: color-mix(in srgb, var(--aad-surface-1) 90%, transparent) !important;
+  }
+
+  html:root [class~="bg-white/85"]:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])) {
+    background-color: color-mix(in srgb, var(--aad-surface-1) 85%, transparent) !important;
+  }
+
+  html:root [class~="bg-white/80"]:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])) {
+    background-color: color-mix(in srgb, var(--aad-surface-1) 80%, transparent) !important;
+  }
+
+  html:root [class~="bg-white/50"]:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])) {
+    background-color: color-mix(in srgb, var(--aad-surface-1) 50%, transparent) !important;
+  }
+
   html:root [class~="hover:bg-white"]:hover,
-  html:root [class~="hover:bg-white/95"]:hover,
   html:root .group:hover [class~="group-hover:bg-white"] {
     background-color: var(--aad-surface-hover) !important;
+  }
+
+  html:root [class~="hover:bg-white/95"]:hover {
+    background-color: color-mix(in srgb, var(--aad-surface-hover) 95%, transparent) !important;
   }
 
   html:root .bg-neutral-300,
@@ -161,8 +185,22 @@
   /* neutral-900 is now near-white. These use it as an ink fill under white text
      (docs code blocks, GET badges, invert-on-hover cards), so keep them dark. */
   html:root .bg-neutral-900:not(:where([class*="hover:bg-"]:hover, .group:hover [class*="group-hover:bg-"])),
-  html:root [class~="data-[selected=true]:bg-neutral-900"][data-selected="true"] {
+  html:root [class~="data-[selected=true]:bg-neutral-900"][data-selected="true"],
+  html:root [class~="data-[state=on]:bg-neutral-900"][data-state="on"],
+  html:root [class~="data-[state=active]:bg-neutral-900"][data-state="active"],
+  html:root [class~="data-[state=checked]:bg-neutral-900"][data-state="checked"] {
     background-color: var(--aad-code) !important;
+  }
+
+  /* Upstream's near-white text tint (code samples on the Data API hero). */
+  html:root .text-brand-blue-light {
+    color: hsl(220 10% 95%) !important;
+  }
+
+  /* Heatmap cells carry an inline data color; dark ink on pale cells stays dark. */
+  html:root [style*="background-color"]:is(.text-neutral-900, .text-black),
+  html:root [style*="background-color"] > :is(.text-neutral-900, .text-black) {
+    color: #171717 !important;
   }
 
   html:root [class~="hover:bg-neutral-900"]:hover,
@@ -333,18 +371,6 @@
     background-color: #35264a !important;
   }
 
-  /* Deliberate accent fills remain vivid. Their text must retain contrast. */
-  html:root .bg-brand-lime,
-  html:root .bg-brand-yellow,
-  html:root .bg-brand-orange,
-  html:root .bg-brand-purple,
-  html:root .bg-brand-blue,
-  html:root .bg-brand-magenta,
-  html:root .bg-black,
-  html:root .bg-neutral-900 {
-    forced-color-adjust: none;
-  }
-
   /* Bright brand fills inherit black text upstream; keep it dark here too. */
   html:root .bg-brand-lime:not(.text-white),
   html:root .bg-brand-yellow:not(.text-white) {
@@ -379,9 +405,21 @@
     color: var(--aad-text) !important;
   }
 
+  /* The navigation's featured links use neutral-700 as a fill under white text. */
+  html:root nav .bg-neutral-700.text-white:not(:where([class*="hover:bg-"]:hover)) {
+    background-color: var(--aad-surface-hover) !important;
+  }
+
+  /* In-page navigation dims inactive links to 50% upstream, which also dims
+     their tiny New/Updated labels below readable contrast on the dark canvas. */
+  html:root aside nav a .opacity-50[class~="group-hover:opacity-100"]:not(:where(.group:hover .opacity-50)) {
+    opacity: 0.7;
+  }
+
   /* Focus. */
   html:root :focus-visible {
-    outline-color: var(--aad-focus);
+    outline: 2px solid var(--aad-focus);
+    outline-offset: 2px;
   }
 
   html:root [class*="focus-visible:ring"]:focus-visible {
@@ -458,9 +496,29 @@
     color: var(--aad-text-muted);
   }
 
-  html:root tbody tr:hover td,
-  html:root tbody tr:hover th {
+  /* Highlight the row underneath cells so heatmaps and selected cells keep their meaning. */
+  html:root tbody tr:hover {
     background-color: color-mix(in srgb, var(--aad-surface-hover) 68%, transparent);
+  }
+
+  /* Arena leaderboards dim unranked rows to 60%, too faint on the dark canvas
+     for their small ± interval labels. */
+  html:root tbody tr.opacity-60 {
+    opacity: 0.75;
+  }
+
+  html:root tbody tr.opacity-60 .text-neutral-400 {
+    color: var(--aad-text-muted) !important;
+  }
+
+  /* Arena Elo bars: inline lab colors, some near-black, gain a faint edge. The
+     interval whisker beyond the bar end is drawn in #171717 ink. */
+  html:root td [class~="inset-y-0"][class~="rounded-[2px]"][style*="background-color"] {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  }
+
+  html:root td [class~="top-1/2"][style*="background-color:#171717"] {
+    background-color: var(--aad-text-muted) !important;
   }
 
   html:root .from-white {
@@ -505,7 +563,7 @@
   }
 
   /* Scatter point names: dark text with a white halo. Invert the halo, not the data. */
-  html:root .recharts-surface text[stroke="white"][paint-order="stroke"] {
+  html:root .recharts-surface text:is([stroke="white"], [stroke="#fff"], [stroke="#ffffff"])[paint-order="stroke"] {
     fill: var(--aad-text) !important;
     stroke: var(--aad-canvas) !important;
   }
@@ -516,9 +574,15 @@
   html:root .recharts-surface path[fill="#000000"],
   html:root .recharts-surface rect[fill="#000"],
   html:root .recharts-surface rect[fill="black"],
-  html:root .recharts-surface rect[fill="#000000"] {
+  html:root .recharts-surface rect[fill="#000000"],
+  html:root .recharts-surface circle:is([fill="#000"], [fill="black"], [fill="#000000"]) {
     stroke: var(--aad-border-strong);
     stroke-width: 1;
+  }
+
+  /* Black line series (e.g. MI355X) get a soft light halo instead. */
+  html:root .recharts-line path:is([stroke="#000"], [stroke="black"], [stroke="#000000"]) {
+    filter: drop-shadow(0 0 1px rgb(245 241 246 / 0.6));
   }
 
   /* Chart watermark: black wordmark paths beside the purple mark. */
@@ -535,8 +599,8 @@
     box-shadow: 0 12px 34px rgb(0 0 0 / 0.48);
   }
 
-  html:root .recharts-tooltip-label,
-  html:root .recharts-tooltip-item {
+  /* Series entries retain their own colors; the heading is neutral. */
+  html:root .recharts-tooltip-label {
     color: var(--aad-text-muted) !important;
   }
 
@@ -691,15 +755,5 @@
   html:root body {
     color: black !important;
     background: white !important;
-  }
-}
-
-/* Respect Windows high-contrast and other forced-color environments. */
-@media (forced-colors: active) {
-  html:root,
-  html:root body {
-    color: CanvasText !important;
-    background: Canvas !important;
-    forced-color-adjust: auto;
   }
 }
